@@ -104,6 +104,14 @@ export default (t) => useMemo(() => ({
     name: t('positionRssi'),
     type: 'number',
   },
+  coolantTemp: {
+    name: t('positionCoolantTemp'),
+    type: 'number',
+  },
+  engineTemp: {
+    name: t('positionEngineTemp'),
+    type: 'number',
+  },
   gps: {
     name: t('positionGps'),
     type: 'number',
@@ -191,6 +199,16 @@ export default (t) => useMemo(() => ({
   out4: {
     name: `${t('positionOutput')} 4`,
     type: 'boolean',
+  },
+  coolantTemp: {
+    name: t('positionCoolantTemp'),
+    type: 'number',
+    dataType: 'celsius',
+  },
+  engineTemp: {
+    name: t('positionEngineTemp'),
+    type: 'number',
+    dataType: 'celsius',
   },
   power: {
     name: t('positionPower'),
