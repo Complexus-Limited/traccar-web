@@ -236,6 +236,7 @@
     "linkAppleMaps": "Apple Maps",
     "linkStreetView": "Street View",
     "positionFaultCount": "Fault Count",
+    "positionGnssStatus": "GNSS Status",
     "positionFixTime": "Fix Time",
     "positionDeviceTime": "Device Time",
     "positionServerTime": "Server Time",
