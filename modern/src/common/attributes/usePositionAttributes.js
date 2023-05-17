@@ -200,10 +200,6 @@ export default (t) => useMemo(() => ({
     name: `${t('positionOutput')} 4`,
     type: 'boolean',
   },
-  gnssStatus: {
-    name: t('positionGnssStatus'),
-    type: 'number',
-  },
   power: {
     name: t('positionPower'),
     type: 'number',
