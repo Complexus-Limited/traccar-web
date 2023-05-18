@@ -200,11 +200,11 @@ export default () => {
     {
       id: 'ordnanceSurvey',
       title: t('mapOrdnanceSurvey'),
-      style: 'https://api.os.uk/maps/vector/v1/vts/resources/styles?key=EAZ8p83u72FTGiLjLC2MsTAl1ko6XQHC',
-      transformRequest: (url) => ({
-        url: `${url}&srs=3857`,
+      style: styleCustom({
+        tiles: ['https://api.os.uk/maps/raster/v1/zxy/Outdoor_3857/{z}/{x}/{y}.png?key=LjNNnLivkvWSvua1BmAAwG7dusxlQzqN'],
       }),
       available: true,
+      attribution: '© <a target="_top" rel="noopener" href=https://shop.ordnancesurvey.co.uk/>Ordnance Survey</a>',
     },
     {
       id: 'mapboxStreets',
