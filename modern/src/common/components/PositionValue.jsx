@@ -70,8 +70,8 @@ const PositionValue = ({ position, property, attribute }) => {
         return value != null ? formatConsumption(value, t) : '';
       case 'coolantTemp':
         return formatTemperature(value);
-        case 'engineTemp':
-          return formatTemperature(value);
+      case 'engineTemp':
+        return formatTemperature(value);
       case 'alarm':
         return formatAlarm(value, t);
       case 'odometer':
