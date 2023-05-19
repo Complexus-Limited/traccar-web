@@ -1,6 +1,6 @@
 {
-  "short_name": "Complexus",
-  "name": "Location Services Portal",
+  "short_name": "${title}",
+  "name": "${description}",
   "icons": [
     {
       "src": "favicon.ico",
@@ -22,6 +22,6 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#1E88E5",
+  "theme_color": "${colorPrimary}",
   "background_color": "#ffffff"
 }
