@@ -104,8 +104,20 @@ export default (t) => useMemo(() => ({
     name: t('positionRssi'),
     type: 'number',
   },
+  unplugged: {
+    name: t('positionUnbplugged'),
+    type: 'number',
+  },
+  faultCount: {
+    name: t('positionFaultCount'),
+    type: 'number',
+  },
   coolantTemp: {
     name: t('positionCoolantTemp'),
+    type: 'number',
+  },
+  engineTemp: {
+    name: t('positionEngineTemp'),
     type: 'number',
   },
   gps: {
