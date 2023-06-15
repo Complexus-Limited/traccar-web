@@ -139,7 +139,7 @@ export default (t) => useMemo(() => ({
   status: {
     name: t('positionStatus'),
     type: 'string',
-    // dataType: 'state',
+    dataType: 'state',
   },
   odometer: {
     name: t('positionOdometer'),
