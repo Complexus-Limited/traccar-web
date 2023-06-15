@@ -11,6 +11,8 @@ import {
 } from './converter';
 import { prefixString } from './stringUtils';
 
+export const formatState = (value, t) => (value ? t('sharedOn') : t('sharedOff'));
+
 export const formatBoolean = (value, t) => (value ? t('sharedYes') : t('sharedNo'));
 
 export const formatNumber = (value, precision = 1) => Number(value.toFixed(precision));
@@ -59,6 +61,8 @@ export const formatAltitude = (value, unit, t) => `${altitudeFromMeters(value, u
 export const formatSpeed = (value, unit, t) => `${speedFromKnots(value, unit).toFixed(2)} ${speedUnitString(unit, t)}`;
 
 export const formatVolume = (value, unit, t) => `${volumeFromLiters(value, unit).toFixed(2)} ${volumeUnitString(unit, t)}`;
+
+export const formatVoltage = (value, precision = 2) => `${Number(value.toFixed(precision))}V`;
 
 export const formatHours = (value) => moment.duration(value).humanize();
 
