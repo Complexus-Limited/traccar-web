@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { Link } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 import {
-  formatAlarm, formatAltitude, formatBoolean, formatCoordinate, formatCourse, formatDistance, formatNumber, formatNumericHours, formatPercentage, formatSpeed, formatTime, formatTemperature, formatVolume,
+  formatAlarm, formatAltitude, formatBoolean, formatCoordinate, formatCourse, formatDistance, formatNumber, formatNumericHours, formatPercentage, formatSpeed, formatTime, formatTemperature, formatVolume, formatVoltage, formatState,
 } from '../util/formatter';
 import { useAttributePreference, usePreference } from '../util/preferences';
 import { useTranslation } from './LocalizationProvider';
@@ -46,6 +46,8 @@ const PositionValue = ({ position, property, attribute }) => {
         return formatAltitude(value, altitudeUnit, t);
       case 'batteryLevel':
         return value != null ? formatPercentage(value, t) : '';
+      case 'power':
+        return formatVoltage(value);
       case 'coolantTemp':
         return formatTemperature(value);
       case 'engineTemp':
@@ -60,6 +62,10 @@ const PositionValue = ({ position, property, attribute }) => {
         return value != null ? formatNumericHours(value, t) : '';
       case 'fuel':
         return formatVolume(value, volumeUnitstring, t);
+      case 'charge':
+        return formatBoolean(value, t);
+      case 'status':
+        return formatState(value, t);
       default:
         if (typeof value === 'number') {
           return formatNumber(value);

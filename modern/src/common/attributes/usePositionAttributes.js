@@ -105,7 +105,7 @@ export default (t) => useMemo(() => ({
     type: 'number',
   },
   unplugged: {
-    name: t('positionUnbplugged'),
+    name: t('positionUnplugged'),
     type: 'number',
   },
   faultCount: {
@@ -139,6 +139,7 @@ export default (t) => useMemo(() => ({
   status: {
     name: t('positionStatus'),
     type: 'string',
+    // dataType: 'state',
   },
   odometer: {
     name: t('positionOdometer'),
