@@ -3,7 +3,22 @@ import { useSelector } from 'react-redux';
 import { Link } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 import {
-  formatAlarm, formatAltitude, formatBoolean, formatCoordinate, formatCourse, formatDistance, formatNumber, formatNumericHours, formatPercentage, formatSpeed, formatTime, formatTemperature, formatVolume,
+  formatAlarm,
+  formatAltitude,
+  formatBoolean,
+  formatCoordinate,
+  formatCourse,
+  formatDistance,
+  formatNumber,
+  formatNumericHours,
+  formatPercentage,
+  formatSpeed,
+  formatTime,
+  formatTemperature,
+  formatVoltage,
+  formatVolume,
+  formatConsumption,
+  formatState,
 } from '../util/formatter';
 import { useAttributePreference, usePreference } from '../util/preferences';
 import { useTranslation } from './LocalizationProvider';
@@ -24,9 +39,9 @@ const PositionValue = ({ position, property, attribute }) => {
   const distanceUnit = useAttributePreference('distanceUnit');
   const altitudeUnit = useAttributePreference('altitudeUnit');
   const speedUnit = useAttributePreference('speedUnit');
+  const volumeUnit = useAttributePreference('volumeUnit');
   const coordinateFormat = usePreference('coordinateFormat');
   const hours12 = usePreference('twelveHourFormat');
-  const volumeUnitstring = usePreference('volumeUnit');
 
   const formatValue = () => {
     switch (key) {
@@ -39,13 +54,19 @@ const PositionValue = ({ position, property, attribute }) => {
       case 'longitude':
         return formatCoordinate('longitude', value, coordinateFormat);
       case 'speed':
-        return formatSpeed(value, speedUnit, t);
+      case 'obdSpeed':
+        return value != null ? formatSpeed(value, speedUnit, t) : '';
       case 'course':
         return formatCourse(value);
       case 'altitude':
         return formatAltitude(value, altitudeUnit, t);
+      case 'power':
+      case 'battery':
+        return formatVoltage(value, t);
       case 'batteryLevel':
         return value != null ? formatPercentage(value, t) : '';
+      case 'power':
+        return formatVoltage(value);
       case 'coolantTemp':
         return formatTemperature(value);
       case 'engineTemp':
@@ -53,6 +74,9 @@ const PositionValue = ({ position, property, attribute }) => {
       case 'alarm':
         return formatAlarm(value, t);
       case 'odometer':
+      case 'serviceOdometer':
+      case 'tripOdometer':
+      case 'obdOdometer':
       case 'distance':
       case 'totalDistance':
         return value != null ? formatDistance(value, distanceUnit, t) : '';
@@ -60,6 +84,10 @@ const PositionValue = ({ position, property, attribute }) => {
         return value != null ? formatNumericHours(value, t) : '';
       case 'fuel':
         return formatVolume(value, volumeUnitstring, t);
+      case 'charge':
+        return formatBoolean(value, t);
+      case 'status':
+        return formatState(value, t);
       default:
         if (typeof value === 'number') {
           return formatNumber(value);
