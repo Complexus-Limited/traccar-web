@@ -3,21 +3,21 @@ import { useSelector } from 'react-redux';
 import { Link } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 import {
-  formatAlarm, 
-  formatAltitude, 
-  formatBoolean, 
-  formatCoordinate, 
-  formatCourse, 
-  formatDistance, 
-  formatNumber, 
-  formatNumericHours, 
-  formatPercentage, 
-  formatSpeed, 
-  formatTime, 
-  formatTemperature, 
-  formatVoltage, 
-  formatVolume, 
-  formatConsumption, 
+  formatAlarm,
+  formatAltitude,
+  formatBoolean,
+  formatCoordinate,
+  formatCourse,
+  formatDistance,
+  formatNumber,
+  formatNumericHours,
+  formatPercentage,
+  formatSpeed,
+  formatTime,
+  formatTemperature,
+  formatVoltage,
+  formatVolume,
+  formatConsumption,
   formatState,
 } from '../util/formatter';
 import { useAttributePreference, usePreference } from '../util/preferences';
@@ -61,7 +61,6 @@ const PositionValue = ({ position, property, attribute }) => {
         return formatCourse(value);
       case 'altitude':
         return formatAltitude(value, altitudeUnit, t);
-      case 'power':
       case 'battery':
         return formatVoltage(value, t);
       case 'batteryLevel':
