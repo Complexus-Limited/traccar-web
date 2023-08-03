@@ -60,7 +60,6 @@ const PositionValue = ({ position, property, attribute }) => {
         return formatCourse(value);
       case 'altitude':
         return formatAltitude(value, altitudeUnit, t);
-      case 'power':
       case 'battery':
         return formatVoltage(value, t);
       case 'batteryLevel':
