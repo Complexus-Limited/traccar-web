@@ -45,7 +45,7 @@ const useStyles = makeStyles((theme) => ({
     alignItems: 'flex-start',
   },
   mediaButton: {
-    color: theme.palette.colors.white,
+    color: theme.palette.primary.contrastText,
     mixBlendMode: 'difference',
   },
   header: {
@@ -58,7 +58,7 @@ const useStyles = makeStyles((theme) => ({
     paddingTop: theme.spacing(1),
     paddingBottom: theme.spacing(1),
     maxHeight: theme.dimensions.cardContentMaxHeight,
-    overflow: 'scroll',
+    overflow: 'auto',
   },
   negative: {
     color: theme.palette.colors.negative,
