@@ -85,6 +85,8 @@ const PositionValue = ({ position, property, attribute }) => {
         return formatBoolean(value, t);
       case 'status':
         return formatState(value, t);
+      case 'signalLevel':
+        return formatPercentage(value, t);
       default:
         if (typeof value === 'number') {
           return formatNumber(value);
