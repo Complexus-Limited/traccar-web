@@ -73,8 +73,6 @@ const PositionValue = ({ position, property, attribute }) => {
         return formatTemperature(value);
       case 'engineTemp':
         return formatTemperature(value);
-      case 'engineTemp':
-        return formatTemperature(value);
       case 'alarm':
         return formatAlarm(value, t);
       case 'odometer':
