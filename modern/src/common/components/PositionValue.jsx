@@ -42,6 +42,7 @@ const PositionValue = ({ position, property, attribute }) => {
   const volumeUnit = useAttributePreference('volumeUnit');
   const coordinateFormat = usePreference('coordinateFormat');
   const hours12 = usePreference('twelveHourFormat');
+  const volumeUnitstring = usePreference('volumeUnit');
 
   const formatValue = () => {
     switch (key) {
@@ -60,10 +61,15 @@ const PositionValue = ({ position, property, attribute }) => {
         return formatCourse(value);
       case 'altitude':
         return formatAltitude(value, altitudeUnit, t);
+      case 'power':
       case 'battery':
         return formatVoltage(value, t);
       case 'batteryLevel':
         return value != null ? formatPercentage(value, t) : '';
+      case 'volume':
+        return value != null ? formatVolume(value, volumeUnit, t) : '';
+      case 'fuelConsumption':
+        return value != null ? formatConsumption(value, t) : '';
       case 'coolantTemp':
         return formatTemperature(value);
       case 'engineTemp':
