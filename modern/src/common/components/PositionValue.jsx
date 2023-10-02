@@ -20,6 +20,7 @@ import {
   formatConsumption,
   formatState,
 } from '../util/formatter';
+import { speedToKnots } from '../util/converter';
 import { useAttributePreference, usePreference } from '../util/preferences';
 import { useTranslation } from './LocalizationProvider';
 import { useAdministrator } from '../util/permissions';
@@ -55,8 +56,9 @@ const PositionValue = ({ position, property, attribute }) => {
       case 'longitude':
         return formatCoordinate('longitude', value, coordinateFormat);
       case 'speed':
-      case 'obdSpeed':
         return value != null ? formatSpeed(value, speedUnit, t) : '';
+      case 'obdSpeed':
+        return value != null ? formatSpeed(speedToKnots(value, 'kmh'), speedUnit, t) : '';
       case 'course':
         return formatCourse(value);
       case 'altitude':
