@@ -102,7 +102,7 @@ export default (t) => useMemo(() => ({
   },
   rssi: {
     name: t('positionRssi'),
-    type: 'number',
+    type: 'percentage',
   },
   unplugged: {
     name: t('positionUnplugged'),
