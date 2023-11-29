@@ -96,6 +96,7 @@ const PositionValue = ({ position, property, attribute }) => {
       case 'rssi':
         return value != null ? formatPercentage(value, t) : '';
       case 'unplugged':
+      case 'manDown':  
           return formatBoolean(value, t);
       default:
         if (typeof value === 'number') {

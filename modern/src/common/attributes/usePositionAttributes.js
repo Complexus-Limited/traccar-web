@@ -120,6 +120,22 @@ export default (t) => useMemo(() => ({
     name: t('positionEngineTemp'),
     type: 'number',
   },
+  amberAlertState: {
+    name: t('positionAmberAlertState'),
+    type: 'number',
+  },
+  manDown: {
+    name: t('positionManDown'),
+    type: 'boolean',
+  },
+  buttonPress: {
+    name: t('positionButtonPress'),
+    type: 'string',
+  },
+  risk: {
+    name: t('positionRisk'),
+    type: 'string',
+  },
   gps: {
     name: t('positionGps'),
     type: 'number',
