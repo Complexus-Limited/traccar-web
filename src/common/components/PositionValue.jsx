@@ -18,6 +18,7 @@ import {
   formatVoltage,
   formatVolume,
   formatConsumption,
+  formatState,
 } from '../util/formatter';
 import { speedToKnots } from '../util/converter';
 import { useAttributePreference, usePreference } from '../util/preferences';
@@ -42,6 +43,8 @@ const PositionValue = ({ position, property, attribute }) => {
   const speedUnit = useAttributePreference('speedUnit');
   const volumeUnit = useAttributePreference('volumeUnit');
   const coordinateFormat = usePreference('coordinateFormat');
+  const hours12 = usePreference('twelveHourFormat');
+  const volumeUnitstring = usePreference('volumeUnit');
 
   const formatValue = () => {
     switch (key) {
@@ -72,6 +75,8 @@ const PositionValue = ({ position, property, attribute }) => {
         return value != null ? formatConsumption(value, t) : '';
       case 'coolantTemp':
         return formatTemperature(value);
+      case 'engineTemp':
+        return formatTemperature(value);
       case 'alarm':
         return formatAlarm(value, t);
       case 'odometer':
@@ -83,6 +88,17 @@ const PositionValue = ({ position, property, attribute }) => {
         return value != null ? formatDistance(value, distanceUnit, t) : '';
       case 'hours':
         return value != null ? formatNumericHours(value, t) : '';
+      case 'fuel':
+        return formatVolume(value, volumeUnitstring, t);
+      case 'charge':
+        return formatBoolean(value, t);
+      case 'status':
+        return formatState(value, t);
+      case 'rssi':
+        return value != null ? formatPercentage(value, t) : '';
+      case 'unplugged':
+      case 'manDown':  
+          return formatBoolean(value, t);
       default:
         if (typeof value === 'number') {
           return formatNumber(value);

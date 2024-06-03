@@ -102,11 +102,39 @@ export default (t) => useMemo(() => ({
   },
   rssi: {
     name: t('positionRssi'),
+    type: 'percentage',
+  },
+  unplugged: {
+    name: t('positionUnplugged'),
+    type: 'number',
+  },
+  faultCount: {
+    name: t('positionFaultCount'),
     type: 'number',
   },
   coolantTemp: {
     name: t('positionCoolantTemp'),
     type: 'number',
+  },
+  engineTemp: {
+    name: t('positionEngineTemp'),
+    type: 'number',
+  },
+  amberAlertState: {
+    name: t('positionAmberAlertState'),
+    type: 'number',
+  },
+  manDown: {
+    name: t('positionManDown'),
+    type: 'boolean',
+  },
+  buttonPress: {
+    name: t('positionButtonPress'),
+    type: 'string',
+  },
+  risk: {
+    name: t('positionRisk'),
+    type: 'string',
   },
   gps: {
     name: t('positionGps'),
@@ -127,6 +155,7 @@ export default (t) => useMemo(() => ({
   status: {
     name: t('positionStatus'),
     type: 'string',
+    dataType: 'state',
   },
   odometer: {
     name: t('positionOdometer'),
