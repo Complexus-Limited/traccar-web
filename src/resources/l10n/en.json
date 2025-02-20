@@ -211,7 +211,7 @@
     "devicePrimaryInfo": "Device Title",
     "deviceSecondaryInfo": "Device Detail",
     "deviceIdentifier": "Identifier",
-    "deviceModel": "Model",
+    "deviceModel": "Tracker Model",
     "deviceContact": "Contact",
     "deviceCategory": "Category",
     "deviceLastUpdate": "Last Update",
