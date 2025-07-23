@@ -1,4 +1,5 @@
 {
+    "sharedDate": "Date",
     "reportGeofenceTime": "Time in Geofence",
     "groupByGeofence": "Group by Geofence",
     "sharedLoading": "Loading...",

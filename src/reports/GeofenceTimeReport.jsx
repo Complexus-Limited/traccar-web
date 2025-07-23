@@ -3,6 +3,9 @@ import {
   Table, TableHead, TableRow, TableCell, TableBody, FormControlLabel, Switch,
 } from '@mui/material';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import scheduleReport from './common/scheduleReport';
+
 
 import PageLayout from '../common/components/PageLayout';
 import ReportsMenu from './components/ReportsMenu';
@@ -18,8 +21,9 @@ import debounce from 'lodash/debounce';
 
 const columnsArray = [
   ['geofenceId', 'sharedGeofence'],
-  ['duration', 'reportDuration'],
+  ['date', 'sharedDate'],
   ['deviceId', 'sharedDevice'],
+  ['duration', 'reportDuration'],
 ];
 const columnsMap = new Map(columnsArray);
 
@@ -31,7 +35,7 @@ const GeofenceTimeReportPage = () => {
   const devices = useSelector((state) => state.devices.items);
   const geofences = useSelector((state) => state.geofences.items);
 
-  const [columns, setColumns] = usePersistedState('geofenceTimeColumns', ['geofenceId', 'duration', 'deviceId']);
+  const [columns, setColumns] = usePersistedState('geofenceTimeColumns', ['geofenceId', 'date', 'deviceId', 'duration']);
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [grouped, setGrouped] = useState(true);
@@ -43,6 +47,9 @@ const GeofenceTimeReportPage = () => {
     deviceIds.forEach((deviceId) => query.append('deviceId', deviceId));
     groupIds.forEach((groupId) => query.append('groupId', groupId));
     query.append('grouped', grouped.toString());
+    if (!grouped) {
+      query.append('groupBy', 'day');
+    }
 
     if (type === 'export') {
       window.location.assign(`/api/reports/geofence-time/xlsx?${query.toString()}`);
@@ -71,6 +78,14 @@ const GeofenceTimeReportPage = () => {
   }, [grouped]);
 
   useEffect(() => {
+    if (!grouped && !columns.includes('date')) {
+      setColumns(prev => [...prev, 'date']);
+    } else if (grouped && columns.includes('date')) {
+      setColumns(prev => prev.filter(col => col !== 'date'));
+    }
+  }, [grouped]);
+
+  useEffect(() => {
     return () => {
       debouncedSubmit.cancel();
     };
@@ -79,6 +94,8 @@ const GeofenceTimeReportPage = () => {
   const formatValue = (item, key) => {
     const value = item[key];
     switch (key) {
+      case 'date':
+        return new Date(value).toLocaleDateString();
       case 'deviceId':
         return devices[value]?.name;
       case 'geofenceId':
@@ -89,7 +106,6 @@ const GeofenceTimeReportPage = () => {
         const hours = Math.floor((totalSeconds % 86400) / 3600);
         const minutes = Math.floor((totalSeconds % 3600) / 60);
         const seconds = totalSeconds % 60;
-
         const parts = [];
         if (days) parts.push(`${days}day(s)`);
         if (hours) parts.push(`${hours}h`);
@@ -103,9 +119,15 @@ const GeofenceTimeReportPage = () => {
     }
   };
 
-  const visibleColumns = grouped
-    ? columns.filter(key => key !== 'deviceId')
-    : columns;
+  const visibleColumns = useMemo(() => {
+    if (grouped) {
+      return columns.filter(key => key !== 'deviceId');
+    }
+
+    // Custom order when grouped is false
+    const customOrder = ['geofenceId', 'date', 'deviceId', 'duration'];
+    return customOrder.filter(key => columns.includes(key));
+  }, [columns, grouped]);
 
   return (
     <PageLayout menu={<ReportsMenu />} breadcrumbs={['reportTitle', 'Geofence Time Report']}>
@@ -114,6 +136,12 @@ const GeofenceTimeReportPage = () => {
           <div className={classes.header}>
             <ReportFilter
               onShow={handleSubmit}
+              onExport={(filters) => handleSubmit({ ...filters, type: 'export' })}
+              onSchedule={(deviceIds, groupIds, report) => {
+                report.type = 'geofence-time';
+                scheduleReport(deviceIds, groupIds, report);
+                navigate('/reports/scheduled');
+              }}
               multiDevice
               deviceType="multiple"
               includeGroups
