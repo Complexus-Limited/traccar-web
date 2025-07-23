@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Table, TableHead, TableRow, TableCell, TableBody, FormControlLabel, Switch,
 } from '@mui/material';
@@ -36,16 +36,8 @@ const GeofenceTimeReportPage = () => {
   const [loading, setLoading] = useState(false);
   const [grouped, setGrouped] = useState(true);
 
-  const debouncedSubmit = useCallback(
-    debounce((filters) => {
-      handleSubmit(filters);
-    }, 500), // 500ms delay
-    [handleSubmit]
-  );
-
-  const handleSubmit = useCatch(async (filters) => {
-    setLastFilters(filters); // Save the filters for reuse
-
+  const handleSubmit = useCallback(useCatch(async (filters) => {
+    setLastFilters(filters);
     const { deviceIds, groupIds, from, to, type } = filters;
     const query = new URLSearchParams({ from, to });
     deviceIds.forEach((deviceId) => query.append('deviceId', deviceId));
@@ -66,13 +58,17 @@ const GeofenceTimeReportPage = () => {
         setLoading(false);
       }
     }
-  });
+  }), [grouped]);
+
+  const debouncedSubmit = useMemo(() => debounce((filters) => {
+    handleSubmit(filters);
+  }, 500), [handleSubmit]);
 
   useEffect(() => {
     if (lastFilters) {
       debouncedSubmit(lastFilters);
     }
-  }, [grouped, lastFilters, debouncedSubmit]);
+  }, [grouped]);
 
   useEffect(() => {
     return () => {
