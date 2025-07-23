@@ -19,6 +19,10 @@ dayjs.extend(duration);
 dayjs.extend(relativeTime);
 dayjs.extend(localizedFormat);
 
+export const formatHours = (value) => dayjs.duration(value).humanize();
+
+export const formatState = (value, t) => (value ? t('sharedOn') : t('sharedOff'));
+
 export const formatBoolean = (value, t) => (value ? t('sharedYes') : t('sharedNo'));
 
 export const formatNumber = (value, precision = 1) => Number(value.toFixed(precision));
@@ -27,7 +31,7 @@ export const formatPercentage = (value) => `${value}%`;
 
 export const formatTemperature = (value) => `${value.toFixed(1)}°C`;
 
-export const formatVoltage = (value, t) => `${value.toFixed(2)} ${t('sharedVoltAbbreviation')}`;
+export const formatVoltage = (value, precision = 2) => `${Number(value.toFixed(precision))}V`;
 
 export const formatConsumption = (value, t) => `${value.toFixed(2)} ${t('sharedLiterPerHourAbbreviation')}`;
 
