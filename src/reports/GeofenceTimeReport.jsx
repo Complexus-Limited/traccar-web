@@ -14,6 +14,7 @@ import TableShimmer from '../common/components/TableShimmer';
 import { useCatch } from '../reactHelper';
 import fetchOrThrow from '../common/util/fetchOrThrow';
 import { useTranslation } from '../common/components/LocalizationProvider';
+import debounce from 'lodash/debounce';
 
 const columnsArray = [
   ['geofenceId', 'sharedGeofence'],
@@ -34,6 +35,13 @@ const GeofenceTimeReportPage = () => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [grouped, setGrouped] = useState(true);
+
+  const debouncedSubmit = useCallback(
+    debounce((filters) => {
+      handleSubmit(filters);
+    }, 500), // 500ms delay
+    [handleSubmit]
+  );
 
   const handleSubmit = useCatch(async (filters) => {
     setLastFilters(filters); // Save the filters for reuse
@@ -62,9 +70,15 @@ const GeofenceTimeReportPage = () => {
 
   useEffect(() => {
     if (lastFilters) {
-      handleSubmit(lastFilters);
+      debouncedSubmit(lastFilters);
     }
-  }, [grouped]);
+  }, [grouped, lastFilters, debouncedSubmit]);
+
+  useEffect(() => {
+    return () => {
+      debouncedSubmit.cancel();
+    };
+  }, [debouncedSubmit]);
 
   const formatValue = (item, key) => {
     const value = item[key];
