@@ -15,6 +15,7 @@ import { useLocation } from 'react-router-dom';
 import { useTranslation } from '../../common/components/LocalizationProvider';
 import { useAdministrator, useRestriction } from '../../common/util/permissions';
 import MenuItem from '../../common/components/MenuItem';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 
 const ReportsMenu = () => {
   const t = useTranslation();
@@ -50,6 +51,12 @@ const ReportsMenu = () => {
           link={`/reports/stops${currentSearch}`}
           icon={<PauseCircleFilledIcon />}
           selected={location.pathname === '/reports/stops'}
+        />
+        <MenuItem
+          title={t('reportGeofenceTime')}
+          link={`/reports/geofence-time${currentSearch}`}
+          icon={<AccessTimeIcon />}
+          selected={location.pathname === '/reports/geofence-time'}
         />
         <MenuItem
           title={t('reportSummary')}

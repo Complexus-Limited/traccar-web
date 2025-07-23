@@ -12,7 +12,7 @@ import SelectField from '../../common/components/SelectField';
 import { useRestriction } from '../../common/util/permissions';
 
 const ReportFilter = ({
-  children, onShow, onExport, onSchedule, deviceType, loading,
+  children, onShow, onExport, onSchedule, deviceType, loading, includeGroups,
 }) => {
   const { classes } = useReportStyles();
   const t = useTranslation();
@@ -28,7 +28,7 @@ const ReportFilter = ({
   const groupIds = useMemo(() => searchParams.getAll('groupId').map(Number), [searchParams]);
   const from = searchParams.get('from');
   const to = searchParams.get('to');
-  const [period, setPeriod] = useState('today');
+  const [period, setPeriod] = useState(searchParams.get('period') || 'today');
   const [customFrom, setCustomFrom] = useState(dayjs().subtract(1, 'hour').locale('en').format('YYYY-MM-DDTHH:mm'));
   const [customTo, setCustomTo] = useState(dayjs().locale('en').format('YYYY-MM-DDTHH:mm'));
   const [selectedOption, setSelectedOption] = useState('json');
@@ -162,7 +162,7 @@ const ReportFilter = ({
           />
         </div>
       )}
-      {deviceType === 'multiple' && (
+      {includeGroups && (
         <div className={classes.filterItem}>
           <SelectField
             label={t('settingsGroups')}

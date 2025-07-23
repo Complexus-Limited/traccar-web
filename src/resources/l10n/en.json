@@ -1,4 +1,6 @@
 {
+    "reportGeofenceTime": "Time in Geofence",
+    "groupByGeofence": "Group by Geofence",
     "sharedLoading": "Loading...",
     "sharedHide": "Hide",
     "sharedSave": "Save",
