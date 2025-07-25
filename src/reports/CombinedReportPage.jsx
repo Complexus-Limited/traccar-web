@@ -75,7 +75,7 @@ const CombinedReportPage = () => {
         )}
         <div className={classes.containerMain}>
           <div className={classes.header}>
-            <ReportFilter onShow={onShow} deviceType="multiple" loading={loading} />
+            <ReportFilter onShow={onShow} deviceType="multiple" includeGroups loading={loading} />
           </div>
           <Table>
             <TableHead>
