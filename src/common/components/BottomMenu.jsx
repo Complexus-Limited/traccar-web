@@ -84,7 +84,11 @@ const BottomMenu = () => {
         navigate('/');
         break;
       case 'reports':
-        navigate('/reports/combined?deviceId=' + deviceId);
+        if (deviceId) {
+          navigate('/reports/combined?deviceId=' + deviceId);
+        } else {
+          navigate('/reports/combined');
+        }
         break;
       case 'settings':
         navigate('/settings/preferences');

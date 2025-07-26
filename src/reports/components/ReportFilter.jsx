@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import {
   FormControl, InputLabel, Select, MenuItem, Button, TextField, Typography,
 } from '@mui/material';
@@ -10,9 +10,10 @@ import useReportStyles from '../common/useReportStyles';
 import SplitButton from '../../common/components/SplitButton';
 import SelectField from '../../common/components/SelectField';
 import { useRestriction } from '../../common/util/permissions';
+//import ReplayPage from '../../other/ReplayPage';
 
 const ReportFilter = ({
-  children, onShow, onExport, onSchedule, deviceType, loading, includeGroups,
+  children, onShow, onExport, onSchedule, deviceType, includeGroups, loading,
 }) => {
   const { classes } = useReportStyles();
   const t = useTranslation();
@@ -37,10 +38,13 @@ const ReportFilter = ({
   const [calendarId, setCalendarId] = useState();
 
   const evaluateDisabled = () => {
-    if (deviceType !== 'none' && !deviceIds.length && !groupIds.length) {
+    if (!deviceIds.length && !groupIds.length) {
       return true;
     }
     if (selectedOption === 'schedule' && (!description || !calendarId)) {
+      return true;
+    }
+    if (!deviceIds.length && location.pathname.includes('replay')) {
       return true;
     }
     return loading;
@@ -106,6 +110,7 @@ const ReportFilter = ({
     const newParams = new URLSearchParams(searchParams);
     newParams.set('from', selectedFrom.toISOString());
     newParams.set('to', selectedTo.toISOString());
+    newParams.set('period', period);
     setSearchParams(newParams, { replace: true });
   };
 
