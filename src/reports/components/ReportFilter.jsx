@@ -38,7 +38,7 @@ const ReportFilter = ({
   const [calendarId, setCalendarId] = useState();
 
   const evaluateDisabled = () => {
-    if (!deviceIds.length && !groupIds.length) {
+    if (deviceType !== 'none' && !deviceIds.length && !groupIds.length) {
       return true;
     }
     if (selectedOption === 'schedule' && (!description || !calendarId)) {
