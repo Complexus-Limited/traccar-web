@@ -507,7 +507,7 @@
     "alarmOverspeed": "Overspeed",
     "alarmFallDown": "Fall Down",
     "alarmLowPower": "Low Power",
-    "alarmLowBattery": "Low Battery",
+    "alarmLowBattery": "Low Device Battery",
     "alarmFault": "Fault",
     "alarmPowerOff": "Power Off",
     "alarmPowerOn": "Power On",

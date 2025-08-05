@@ -6,6 +6,7 @@ import { useDispatch } from 'react-redux';
 import MainPage from './main/MainPage';
 import CombinedReportPage from './reports/CombinedReportPage';
 import PositionsReportPage from './reports/PositionsReportPage';
+import GeofenceTimeReport from './reports/GeofenceTimeReport';
 import ServerPage from './settings/ServerPage';
 import UsersPage from './settings/UsersPage';
 import DevicePage from './settings/DevicePage';
@@ -169,6 +170,7 @@ const Navigation = () => {
           <Route path="events" element={<EventReportPage />} />
           <Route path="route" element={<PositionsReportPage />} />
           <Route path="stops" element={<StopReportPage />} />
+          <Route path="geofence-time" element={<GeofenceTimeReport />} />
           <Route path="summary" element={<SummaryReportPage />} />
           <Route path="trips" element={<TripReportPage />} />
           <Route path="scheduled" element={<ScheduledPage />} />

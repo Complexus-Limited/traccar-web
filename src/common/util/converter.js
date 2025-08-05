@@ -50,9 +50,9 @@ export const distanceUnitString = (unit, t) => {
   }
 };
 
-export const distanceFromMeters = (value, unit) => value * distanceConverter(unit);
+export const distanceFromMeters = (value, unit) => Math.round(value * distanceConverter(unit));
 
-export const distanceToMeters = (value, unit) => value / distanceConverter(unit);
+export const distanceToMeters = (value, unit) => Math.round(value / distanceConverter(unit));
 
 const altitudeConverter = (unit) => {
   switch (unit) {
