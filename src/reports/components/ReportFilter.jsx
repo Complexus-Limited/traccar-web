@@ -13,7 +13,7 @@ import { useRestriction } from '../../common/util/permissions';
 //import ReplayPage from '../../other/ReplayPage';
 
 const ReportFilter = ({
-  children, onShow, onExport, onSchedule, deviceType, includeGroups, loading,
+  children, onShow, onExport, onSchedule, deviceType, eventTypes, alarmTypes, includeGroups, loading,
 }) => {
   const { classes } = useReportStyles();
   const t = useTranslation();
@@ -69,9 +69,9 @@ const ReportFilter = ({
 
   useEffect(() => {
     if (from && to) {
-      onShow({ deviceIds, groupIds, from, to });
+      onShow({ deviceIds, groupIds, from, to, eventTypes, alarmTypes });
     }
-  }, [deviceIds, groupIds, from, to]);
+  }, [deviceIds, groupIds, from, to, eventTypes, alarmTypes]);
 
   const showReport = () => {
     let selectedFrom;
