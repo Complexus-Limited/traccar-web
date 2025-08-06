@@ -78,14 +78,6 @@ const GeofenceTimeReportPage = () => {
   }, [grouped]);
 
   useEffect(() => {
-    if (!grouped && !columns.includes('date')) {
-      setColumns(prev => [...prev, 'date']);
-    } else if (grouped && columns.includes('date')) {
-      setColumns(prev => prev.filter(col => col !== 'date'));
-    }
-  }, [grouped]);
-
-  useEffect(() => {
     return () => {
       debouncedSubmit.cancel();
     };
@@ -121,13 +113,18 @@ const GeofenceTimeReportPage = () => {
 
   const visibleColumns = useMemo(() => {
     if (grouped) {
-      return columns.filter(key => key !== 'deviceId');
+      return columns.filter(key => key !== 'deviceId' && key !== 'date');
     }
 
     // Custom order when grouped is false
     const customOrder = ['geofenceId', 'date', 'deviceId', 'duration'];
     return customOrder.filter(key => columns.includes(key));
   }, [columns, grouped]);
+
+  const dropdownColumns = useMemo(() => {
+    const hiddenKeys = grouped ? ['date', 'deviceId'] : [];
+    return columnsArray.filter(([key]) => !hiddenKeys.includes(key));
+  }, [grouped]);
 
   return (
     <PageLayout menu={<ReportsMenu />} breadcrumbs={['reportTitle', 'Geofence Time Report']}>
@@ -150,7 +147,7 @@ const GeofenceTimeReportPage = () => {
               <ColumnSelect
                 columns={columns}
                 setColumns={setColumns}
-                columnsArray={columnsArray}
+                columnsArray={dropdownColumns}
               />
               <FormControlLabel
                 control={
