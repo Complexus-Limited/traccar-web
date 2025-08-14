@@ -72,7 +72,7 @@ const GeofenceTimeReportPage = () => {
   }, 500), [handleSubmit]);
 
   useEffect(() => {
-    if (lastFilters) {
+    if (lastFilters !== null) {
       debouncedSubmit(lastFilters);
     }
   }, [grouped]);
