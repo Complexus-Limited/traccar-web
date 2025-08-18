@@ -1,9 +1,10 @@
+
 import {
   Fragment, useCallback, useEffect, useRef, useState,
 } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  IconButton, Table, TableBody, TableCell, TableHead, TableRow,
+  IconButton, Table, TableBody, TableCell, TableHead, TableRow, TablePagination,
 } from '@mui/material';
 import GpsFixedIcon from '@mui/icons-material/GpsFixed';
 import LocationSearchingIcon from '@mui/icons-material/LocationSearching';
@@ -44,6 +45,9 @@ const PositionsReportPage = () => {
   const [loading, setLoading] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
 
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(50);
+
   const selectedIcon = useRef();
 
   useEffect(() => {
@@ -54,7 +58,7 @@ const PositionsReportPage = () => {
 
   const onMapPointClick = useCallback((positionId) => {
     setSelectedItem(items.find((it) => it.id === positionId));
-  }, [items, setSelectedItem]);
+  }, [items]);
 
   const onShow = useCatch(async ({ deviceIds, from, to }) => {
     const query = new URLSearchParams({ from, to });
@@ -80,6 +84,7 @@ const PositionsReportPage = () => {
       });
       setAvailable([...keyList, ...keySet].map((key) => [key, positionAttributes[key]?.name || key]));
       setItems(data);
+      setPage(0);
     } finally {
       setLoading(false);
     }
@@ -96,6 +101,15 @@ const PositionsReportPage = () => {
     await scheduleReport(deviceIds, groupIds, report);
     navigate('/reports/scheduled');
   });
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   return (
     <PageLayout menu={<ReportsMenu />} breadcrumbs={['reportTitle', 'reportPositions']}>
@@ -140,7 +154,7 @@ const PositionsReportPage = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {!loading ? items.slice(0, 4000).map((item) => (
+              {!loading ? items.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item) => (
                 <TableRow key={item.id}>
                   <TableCell className={classes.columnAction} padding="none">
                     {selectedItem === item ? (
@@ -176,6 +190,15 @@ const PositionsReportPage = () => {
               )) : (<TableShimmer columns={columns.length + 1} startAction />)}
             </TableBody>
           </Table>
+          <TablePagination
+            component="div"
+            count={items.length}
+            page={page}
+            onPageChange={handleChangePage}
+            rowsPerPage={rowsPerPage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            rowsPerPageOptions={[10, 25, 50, 100, 250, 500]}
+          />
         </div>
       </div>
     </PageLayout>
