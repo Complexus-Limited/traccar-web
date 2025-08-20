@@ -40,9 +40,12 @@ const GeofenceTimeReportPage = () => {
   const [loading, setLoading] = useState(false);
   const [grouped, setGrouped] = useState(true);
 
+
   const handleSubmit = useCallback(useCatch(async (filters) => {
-    setLastFilters(filters);
-    const { deviceIds, groupIds, from, to, type } = filters;
+    const { type, ...pureFilters } = filters;
+    setLastFilters(pureFilters); // Save only the filters relevant for data fetching
+
+    const { deviceIds, groupIds, from, to } = pureFilters;
     const query = new URLSearchParams({ from, to });
     deviceIds.forEach((deviceId) => query.append('deviceId', deviceId));
     groupIds.forEach((groupId) => query.append('groupId', groupId));
@@ -68,11 +71,13 @@ const GeofenceTimeReportPage = () => {
   }), [grouped]);
 
   const debouncedSubmit = useMemo(() => debounce((filters) => {
-    handleSubmit(filters);
+    const { type, ...safeFilters } = filters;
+    handleSubmit(safeFilters);
   }, 500), [handleSubmit]);
 
   useEffect(() => {
     if (lastFilters !== null) {
+      const { type, ...rest } = lastFilters
       debouncedSubmit(lastFilters);
     }
   }, [grouped]);
