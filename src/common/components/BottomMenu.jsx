@@ -76,13 +76,19 @@ const BottomMenu = () => {
     dispatch(sessionActions.updateUser(null));
   };
 
+  const deviceId = useSelector((state) => state.devices.selectedId);
+
   const handleSelection = (event, value) => {
     switch (value) {
       case 'map':
         navigate('/');
         break;
       case 'reports':
-        navigate('/reports/combined');
+        if (deviceId) {
+          navigate('/reports/combined?deviceId=' + deviceId);
+        } else {
+          navigate('/reports/combined');
+        }
         break;
       case 'settings':
         navigate('/settings/preferences');

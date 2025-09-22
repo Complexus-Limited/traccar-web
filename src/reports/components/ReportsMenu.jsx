@@ -15,10 +15,12 @@ import { useLocation } from 'react-router-dom';
 import { useTranslation } from '../../common/components/LocalizationProvider';
 import { useAdministrator, useRestriction } from '../../common/util/permissions';
 import MenuItem from '../../common/components/MenuItem';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 
 const ReportsMenu = () => {
   const t = useTranslation();
   const location = useLocation();
+  const currentSearch = location.search;
 
   const admin = useAdministrator();
   const readonly = useRestriction('readonly');
@@ -28,48 +30,54 @@ const ReportsMenu = () => {
       <List>
         <MenuItem
           title={t('reportCombined')}
-          link="/reports/combined"
+          link={`/reports/combined${currentSearch}`}
           icon={<StarIcon />}
           selected={location.pathname === '/reports/combined'}
         />
         <MenuItem
           title={t('reportEvents')}
-          link="/reports/events"
+          link={`/reports/events${currentSearch}`}
           icon={<NotificationsActiveIcon />}
           selected={location.pathname === '/reports/events'}
         />
         <MenuItem
           title={t('reportTrips')}
-          link="/reports/trips"
+          link={`/reports/trips${currentSearch}`}
           icon={<PlayCircleFilledIcon />}
           selected={location.pathname === '/reports/trips'}
         />
         <MenuItem
           title={t('reportStops')}
-          link="/reports/stops"
+          link={`/reports/stops${currentSearch}`}
           icon={<PauseCircleFilledIcon />}
           selected={location.pathname === '/reports/stops'}
         />
         <MenuItem
+          title={t('reportGeofenceTime')}
+          link={`/reports/geofence-time${currentSearch}`}
+          icon={<AccessTimeIcon />}
+          selected={location.pathname === '/reports/geofence-time'}
+        />
+        <MenuItem
           title={t('reportSummary')}
-          link="/reports/summary"
+          link={`/reports/summary${currentSearch}`}
           icon={<FormatListBulletedIcon />}
           selected={location.pathname === '/reports/summary'}
         />
         <MenuItem
           title={t('reportChart')}
-          link="/reports/chart"
+          link={`/reports/chart${currentSearch}`}
           icon={<TrendingUpIcon />}
           selected={location.pathname === '/reports/chart'}
         />
         <MenuItem
           title={t('reportReplay')}
-          link="/replay"
+          link={`/replay${currentSearch}`}
           icon={<RouteIcon />}
         />
         <MenuItem
           title={t('reportPositions')}
-          link="/reports/route"
+          link={`/reports/route${currentSearch}`}
           icon={<TimelineIcon />}
           selected={location.pathname === '/reports/route'}
         />

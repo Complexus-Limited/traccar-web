@@ -191,7 +191,7 @@ const EventReportPage = () => {
         )}
         <div className={classes.containerMain}>
           <div className={classes.header}>
-            <ReportFilter onShow={onShow} onExport={onExport} onSchedule={onSchedule} deviceType="multiple" loading={loading}>
+            <ReportFilter onShow={onShow} onExport={onExport} onSchedule={onSchedule} deviceType="multiple" eventTypes={eventTypes} alarmTypes={alarmTypes} includeGroups loading={loading}>
               <div className={classes.filterItem}>
                 <FormControl fullWidth>
                   <InputLabel>{t('reportEventTypes')}</InputLabel>

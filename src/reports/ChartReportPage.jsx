@@ -51,6 +51,7 @@ const ChartReportPage = () => {
     const positions = await response.json();
     const keySet = new Set();
     const keyList = [];
+
     const formattedPositions = positions.map((position) => {
       const data = { ...position, ...position.attributes };
       const formatted = {};
@@ -64,11 +65,9 @@ const ChartReportPage = () => {
           const definition = positionAttributes[key] || {};
           switch (definition.dataType) {
             case 'speed':
-              if (key == 'obdSpeed') {
-                formatted[key] = speedFromKnots(speedToKnots(value, 'kmh'), speedUnit).toFixed(2);
-              } else {
-                formatted[key] = speedFromKnots(value, speedUnit).toFixed(2);
-              }
+              formatted[key] = key === 'obdSpeed'
+                ? speedFromKnots(speedToKnots(value, 'kmh'), speedUnit).toFixed(2)
+                : speedFromKnots(value, speedUnit).toFixed(2);
               break;
             case 'altitude':
               formatted[key] = altitudeFromMeters(value, altitudeUnit).toFixed(2);
@@ -90,14 +89,23 @@ const ChartReportPage = () => {
       });
       return formatted;
     });
+
     Object.keys(positionAttributes).forEach((key) => {
       if (keySet.has(key)) {
         keyList.push(key);
         keySet.delete(key);
       }
     });
+
+    // ✅ Clean and sort data
+    const cleanedSortedPositions = formattedPositions
+      .filter((pos, index, self) =>
+        self.findIndex(p => p[timeType] === pos[timeType]) === index
+      )
+      .sort((a, b) => a[timeType] - b[timeType]);
+
     setTypes([...keyList, ...keySet]);
-    setItems(formattedPositions);
+    setItems(cleanedSortedPositions);
   });
 
   const colorPalette = [
@@ -149,6 +157,7 @@ const ChartReportPage = () => {
         <div className={classes.chart}>
           <ResponsiveContainer>
             <LineChart
+              key={timeType + selectedTypes.join(',') + items.length} // forces re-render
               data={items}
               margin={{
                 top: 10, right: 40, left: 0, bottom: 10,
@@ -179,6 +188,8 @@ const ChartReportPage = () => {
                 height={30}
                 stroke={theme.palette.primary.main}
                 tickFormatter={() => ''}
+                startIndex={0}
+                endIndex={items.length - 1}
               />
               {selectedTypes.map((type, index) => (
                 <Line
