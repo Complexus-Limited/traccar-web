@@ -99,6 +99,8 @@ const PositionValue = ({ position, property, attribute }) => {
       case 'manDown':  
         return formatBoolean(value, t);
       case 'intakeAirTemp':
+        return value != null ? formatTemperature(value) : '';
+      case 'maf':
         return value != null ? formatTemperature(value) : '';   
       default:
         if (typeof value === 'number') {

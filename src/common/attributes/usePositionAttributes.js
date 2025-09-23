@@ -303,6 +303,10 @@ export default (t) => useMemo(() => ({
     name: t('positionIntakeAirTemp'),
     type: 'number', 
   },
+  maf: {
+    name: t('positionMaf'),
+    type: 'number', 
+  },
   vin: {
     name: t('positionVin'),
     type: 'string',

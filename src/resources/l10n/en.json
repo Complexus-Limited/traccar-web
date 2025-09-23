@@ -270,6 +270,7 @@
     "linkAppleMaps": "Apple Maps",
     "linkStreetView": "Street View",
     "positionIntakeAirTemp": "Intake Air Temperature",
+    "positionMaf": "MAF",
     "positionFaultCount": "Fault Count",
     "positionGnssStatus": "GNSS Status",
     "positionFixTime": "Fix Time",
