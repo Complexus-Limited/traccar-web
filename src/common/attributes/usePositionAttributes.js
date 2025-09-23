@@ -319,6 +319,10 @@ export default (t) => useMemo(() => ({
     name: t('positionThrottle'),
     type: 'number',
   },
+  driverBehaviour: {
+    name: t('positionDriverBehaviour'),
+    type: 'number',
+  },
   motion: {
     name: t('positionMotion'),
     type: 'boolean',
