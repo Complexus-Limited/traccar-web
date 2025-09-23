@@ -325,7 +325,7 @@
     "positionArchive": "Archive",
     "positionVin": "VIN",
     "positionApproximate": "Approximate",
-    "positionThrottle": "Throttle",
+    "positionThrottle": "Throttle Position",
     "positionMotion": "Motion",
     "positionArmed": "Armed",
     "positionAcceleration": "Acceleration",

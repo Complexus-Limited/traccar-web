@@ -101,7 +101,9 @@ const PositionValue = ({ position, property, attribute }) => {
       case 'intakeAirTemp':
         return value != null ? formatTemperature(value) : '';
       case 'maf':
-        return value != null ? formatTemperature(value) : '';   
+        return value != null ? formatTemperature(value) : '';
+      case 'throttle':
+        return value != null ? formatPercentage(value) : '';   
       default:
         if (typeof value === 'number') {
           return formatNumber(value);
