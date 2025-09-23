@@ -97,7 +97,9 @@ const PositionValue = ({ position, property, attribute }) => {
         return value != null ? formatPercentage(value, t) : '';
       case 'unplugged':
       case 'manDown':  
-            return formatBoolean(value, t);
+        return formatBoolean(value, t);
+      case 'intakeAirTemp':
+        return value != null ? formatTemperature(value) : '';   
       default:
         if (typeof value === 'number') {
           return formatNumber(value);

@@ -269,6 +269,7 @@
     "linkGoogleMaps": "Google Maps",
     "linkAppleMaps": "Apple Maps",
     "linkStreetView": "Street View",
+    "positionIntakeAirTemp": "Intake Air Temperature",
     "positionFaultCount": "Fault Count",
     "positionGnssStatus": "GNSS Status",
     "positionFixTime": "Fix Time",
