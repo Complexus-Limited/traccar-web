@@ -315,6 +315,10 @@ export default (t) => useMemo(() => ({
     name: t('positionApproximate'),
     type: 'boolean',
   },
+  bleBattery1: {
+    name: t('positionBleBattery1'),
+    type: 'percentage',
+  },
   throttle: {
     name: t('positionThrottle'),
     type: 'number',

@@ -103,7 +103,9 @@ const PositionValue = ({ position, property, attribute }) => {
       case 'maf':
         return value != null ? formatTemperature(value) : '';
       case 'throttle':
-        return value != null ? formatPercentage(value) : '';   
+        return value != null ? formatPercentage(value) : '';
+      case 'bleBattery1':
+        return value != null ? formatPercentage(value) : ''; 
       default:
         if (typeof value === 'number') {
           return formatNumber(value);
