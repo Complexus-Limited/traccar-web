@@ -105,6 +105,8 @@ const PositionValue = ({ position, property, attribute }) => {
       case 'throttle':
         return value != null ? formatPercentage(value) : '';
       case 'bleBattery1':
+        return value != null ? formatPercentage(value) : '';
+      case 'bleHumidity1':
         return value != null ? formatPercentage(value) : ''; 
       default:
         if (typeof value === 'number') {

@@ -319,6 +319,10 @@ export default (t) => useMemo(() => ({
     name: t('positionBleBattery1'),
     type: 'percentage',
   },
+    bleHumidity1: {
+    name: t('positionBleHumidity1'),
+    type: 'percentage',
+  },
   throttle: {
     name: t('positionThrottle'),
     type: 'number',
