@@ -110,6 +110,8 @@ const PositionValue = ({ position, property, attribute }) => {
         return value != null ? formatPercentage(value) : '';
       case 'egrError':
         return value != null ? formatPercentage(value) : '';
+      case 'oilLevel':  
+        return formatBoolean(value, t);
       default:
         if (typeof value === 'number') {
           return formatNumber(value);

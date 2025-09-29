@@ -315,6 +315,10 @@ export default (t) => useMemo(() => ({
     name: t('positionApproximate'),
     type: 'boolean',
   },
+  oilLevel: {
+    name: t('positionOilLevel'),
+    type: 'boolean',
+  },
   egrError: {
     name: t('positionEgrError'),
     type: 'percentage',
