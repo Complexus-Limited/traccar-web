@@ -269,6 +269,7 @@
     "linkGoogleMaps": "Google Maps",
     "linkAppleMaps": "Apple Maps",
     "linkStreetView": "Street View",
+    "positionEgrError": "EGR Error",
     "positionBleHumidity1": "BLE Humidity 1",
     "positionBleBattery1": "BLE Battery 1",
     "positionDriverBehaviour": "Driver Behaviour",

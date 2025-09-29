@@ -315,6 +315,10 @@ export default (t) => useMemo(() => ({
     name: t('positionApproximate'),
     type: 'boolean',
   },
+  egrError: {
+    name: t('positionEgrError'),
+    type: 'percentage',
+  },
   bleBattery1: {
     name: t('positionBleBattery1'),
     type: 'percentage',

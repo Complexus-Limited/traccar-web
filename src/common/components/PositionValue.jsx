@@ -107,7 +107,9 @@ const PositionValue = ({ position, property, attribute }) => {
       case 'bleBattery1':
         return value != null ? formatPercentage(value) : '';
       case 'bleHumidity1':
-        return value != null ? formatPercentage(value) : ''; 
+        return value != null ? formatPercentage(value) : '';
+      case 'egrError':
+        return value != null ? formatPercentage(value) : '';
       default:
         if (typeof value === 'number') {
           return formatNumber(value);
