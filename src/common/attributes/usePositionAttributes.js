@@ -315,6 +315,10 @@ export default (t) => useMemo(() => ({
     name: t('positionApproximate'),
     type: 'boolean',
   },
+  sleepMode: {
+    name: t('positionSleepMode'),
+    type: 'number',
+  },
   immobiliserState: {
     name: t('positionImmobiliserState'),
     type: 'number',
