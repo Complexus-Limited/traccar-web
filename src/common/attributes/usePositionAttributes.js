@@ -315,6 +315,10 @@ export default (t) => useMemo(() => ({
     name: t('positionApproximate'),
     type: 'boolean',
   },
+  adBlueLevel: {
+    name: t('positionAdBlueLevel'),
+    type: 'percentage',
+  },
   oilLevel: {
     name: t('positionOilLevel'),
     type: 'boolean',

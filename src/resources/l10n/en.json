@@ -269,6 +269,7 @@
     "linkGoogleMaps": "Google Maps",
     "linkAppleMaps": "Apple Maps",
     "linkStreetView": "Street View",
+    "positionAdBlueLevel": "AdBlue Level",
     "positionOilLevel": "Low Oil Level indicator",
     "positionEgrError": "EGR Error",
     "positionBleHumidity1": "BLE Humidity 1",

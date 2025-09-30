@@ -112,6 +112,8 @@ const PositionValue = ({ position, property, attribute }) => {
         return value != null ? formatPercentage(value) : '';
       case 'oilLevel':  
         return formatBoolean(value, t);
+      case 'adBlueLevel':
+        return value != null ? formatPercentage(value) : '';
       default:
         if (typeof value === 'number') {
           return formatNumber(value);
