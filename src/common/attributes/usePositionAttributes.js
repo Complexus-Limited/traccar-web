@@ -315,6 +315,10 @@ export default (t) => useMemo(() => ({
     name: t('positionApproximate'),
     type: 'boolean',
   },
+  immobiliserState: {
+    name: t('positionImmobiliserState'),
+    type: 'number',
+  },
   adBlueLevel: {
     name: t('positionAdBlueLevel'),
     type: 'percentage',

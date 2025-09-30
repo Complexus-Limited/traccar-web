@@ -269,6 +269,7 @@
     "linkGoogleMaps": "Google Maps",
     "linkAppleMaps": "Apple Maps",
     "linkStreetView": "Street View",
+    "positionImmobiliserState": "Immobiliser State",
     "positionAdBlueLevel": "AdBlue Level",
     "positionOilLevel": "Low Oil Level indicator",
     "positionEgrError": "EGR Error",
