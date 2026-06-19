@@ -145,14 +145,7 @@ const SummaryReportPage = () => {
   return (
     <PageLayout menu={<ReportsMenu />} breadcrumbs={['reportTitle', 'reportSummary']}>
       <div className={classes.header}>
-        <ReportFilter
-          onShow={onShow}
-          onExport={onExport}
-          onSchedule={onSchedule}
-          deviceType="multiple"
-          loading={loading}
-          formats={['xlsx']}
-        >
+        <ReportFilter onShow={onShow} onExport={onExport} onSchedule={onSchedule} deviceType="multiple" includeGroups loading={loading}>
           <div className={classes.filterItem}>
             <FormControl fullWidth>
               <InputLabel>{t('sharedType')}</InputLabel>

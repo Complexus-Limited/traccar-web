@@ -1,6 +1,11 @@
-import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
+
+import {
+  Fragment, useCallback, useEffect, useRef, useState,
+} from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { IconButton, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
+import {
+  IconButton, Table, TableBody, TableCell, TableHead, TableRow, TablePagination,
+} from '@mui/material';
 import GpsFixedIcon from '@mui/icons-material/GpsFixed';
 import LocationSearchingIcon from '@mui/icons-material/LocationSearching';
 import ReportFilter, { updateReportParams } from './components/ReportFilter';
@@ -47,7 +52,10 @@ const PositionsReportPage = () => {
   const [loading, setLoading] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
 
-  const selectedRef = useRef();
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(50);
+
+  const selectedIcon = useRef();
 
   useEffect(() => {
     if (selectedRef.current) {
@@ -55,51 +63,42 @@ const PositionsReportPage = () => {
     }
   }, [selectedItem]);
 
-  const onMapPointClick = useCallback(
-    (positionId) => {
-      setSelectedItem(items.find((it) => it.id === positionId));
-    },
-    [items, setSelectedItem],
-  );
+  const onMapPointClick = useCallback((positionId) => {
+    setSelectedItem(items.find((it) => it.id === positionId));
+  }, [items]);
 
-  const onShow = useCatchCallback(
-    async ({ deviceIds, from, to }) => {
-      const query = new URLSearchParams({ from, to });
-      if (geofenceId) {
-        query.append('geofenceId', geofenceId);
-      }
-      deviceIds.forEach((deviceId) => query.append('deviceId', deviceId));
-      setLoading(true);
-      try {
-        const response = await fetchOrThrow(`/api/positions?${query.toString()}`, {
-          headers: { Accept: 'application/json' },
-        });
-        const data = await response.json();
-        const keySet = new Set();
-        const keyList = [];
-        data.forEach((position) => {
-          Object.keys(position).forEach((it) => keySet.add(it));
-          Object.keys(position.attributes).forEach((it) => keySet.add(it));
-        });
-        ['id', 'deviceId', 'outdated', 'network', 'attributes'].forEach((key) =>
-          keySet.delete(key),
-        );
-        Object.keys(positionAttributes).forEach((key) => {
-          if (keySet.has(key)) {
-            keyList.push(key);
-            keySet.delete(key);
-          }
-        });
-        setAvailable(
-          [...keyList, ...keySet].map((key) => [key, positionAttributes[key]?.name || key]),
-        );
-        setItems(data);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [geofenceId, positionAttributes],
-  );
+  const onShow = useCatch(async ({ deviceIds, from, to }) => {
+    const query = new URLSearchParams({ from, to });
+    if (geofenceId) {
+      query.append('geofenceId', geofenceId)
+    }
+    deviceIds.forEach((deviceId) => query.append('deviceId', deviceId));
+    setLoading(true);
+    try {
+      const response = await fetchOrThrow(`/api/positions?${query.toString()}`, {
+        headers: { Accept: 'application/json' },
+      });
+      const data = await response.json();
+      const keySet = new Set();
+      const keyList = [];
+      data.forEach((position) => {
+        Object.keys(position).forEach((it) => keySet.add(it));
+        Object.keys(position.attributes).forEach((it) => keySet.add(it));
+      });
+      ['id', 'deviceId', 'outdated', 'network', 'attributes'].forEach((key) => keySet.delete(key));
+      Object.keys(positionAttributes).forEach((key) => {
+        if (keySet.has(key)) {
+          keyList.push(key);
+          keySet.delete(key);
+        }
+      });
+      setAvailable([...keyList, ...keySet].map((key) => [key, positionAttributes[key]?.name || key]));
+      setItems(data);
+      setPage(0);
+    } finally {
+      setLoading(false);
+    }
+  });
 
   const onExport = useCatch(async ({ deviceIds, from, to, format }) => {
     const query = new URLSearchParams({ from, to });
@@ -115,6 +114,15 @@ const PositionsReportPage = () => {
     await scheduleReport(deviceIds, groupIds, report);
     navigate('/reports/scheduled');
   });
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   return (
     <PageLayout menu={<ReportsMenu />} breadcrumbs={['reportTitle', 'reportPositions']}>
@@ -183,41 +191,25 @@ const PositionsReportPage = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {!loading ? (
-                items.slice(0, 4000).map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell className={classes.columnAction} padding="none">
-                      {selectedItem === item ? (
-                        <IconButton
-                          size="small"
-                          onClick={() => setSelectedItem(null)}
-                          ref={selectedRef}
-                        >
-                          <GpsFixedIcon fontSize="small" />
-                        </IconButton>
-                      ) : (
-                        <IconButton size="small" onClick={() => setSelectedItem(item)}>
-                          <LocationSearchingIcon fontSize="small" />
-                        </IconButton>
-                      )}
-                    </TableCell>
-                    {columns.map((key) => (
-                      <TableCell key={key}>
-                        <PositionValue
-                          position={item}
-                          property={item.hasOwnProperty(key) ? key : null}
-                          attribute={item.hasOwnProperty(key) ? null : key}
-                        />
-                      </TableCell>
-                    ))}
-                    <TableCell className={classes.actionCellPadding}>
-                      <CollectionActions
-                        itemId={item.id}
-                        endpoint="positions"
-                        readonly={readonly}
-                        onReload={() => {
-                          setItems(items.filter((position) => position.id !== item.id));
-                        }}
+              {!loading ? items.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item) => (
+                <TableRow key={item.id}>
+                  <TableCell className={classes.columnAction} padding="none">
+                    {selectedItem === item ? (
+                      <IconButton size="small" onClick={() => setSelectedItem(null)} ref={selectedIcon}>
+                        <GpsFixedIcon fontSize="small" />
+                      </IconButton>
+                    ) : (
+                      <IconButton size="small" onClick={() => setSelectedItem(item)}>
+                        <LocationSearchingIcon fontSize="small" />
+                      </IconButton>
+                    )}
+                  </TableCell>
+                  {columns.map((key) => (
+                    <TableCell key={key}>
+                      <PositionValue
+                        position={item}
+                        property={item.hasOwnProperty(key) ? key : null}
+                        attribute={item.hasOwnProperty(key) ? null : key}
                       />
                     </TableCell>
                   </TableRow>
@@ -227,6 +219,15 @@ const PositionsReportPage = () => {
               )}
             </TableBody>
           </Table>
+          <TablePagination
+            component="div"
+            count={items.length}
+            page={page}
+            onPageChange={handleChangePage}
+            rowsPerPage={rowsPerPage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            rowsPerPageOptions={[10, 25, 50, 100, 250, 500]}
+          />
         </div>
       </div>
     </PageLayout>

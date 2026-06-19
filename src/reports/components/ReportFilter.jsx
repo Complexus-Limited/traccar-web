@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import {
   FormControl,
   InputLabel,
@@ -16,6 +16,7 @@ import useReportStyles from '../common/useReportStyles';
 import SplitButton from '../../common/components/SplitButton';
 import SelectField from '../../common/components/SelectField';
 import { useRestriction } from '../../common/util/permissions';
+//import ReplayPage from '../../other/ReplayPage';
 import { deviceEquality } from '../../common/util/deviceEquality';
 
 export const updateReportParams = (searchParams, setSearchParams, key, values) => {
@@ -27,7 +28,9 @@ export const updateReportParams = (searchParams, setSearchParams, key, values) =
   setSearchParams(newParams, { replace: true });
 };
 
-const ReportFilter = ({ children, onShow, onExport, onSchedule, deviceType, loading, formats }) => {
+const ReportFilter = ({
+  children, onShow, onExport, onSchedule, deviceType, eventTypes, alarmTypes, includeGroups, loading,
+}) => {
   const { classes } = useReportStyles();
   const t = useTranslation();
 
@@ -56,11 +59,9 @@ const ReportFilter = ({ children, onShow, onExport, onSchedule, deviceType, load
   const groupIds = useMemo(() => searchParams.getAll('groupId').map(Number), [searchParams]);
   const from = searchParams.get('from');
   const to = searchParams.get('to');
-  const [period, setPeriod] = useState('today');
-  const [customFrom, setCustomFrom] = useState(() =>
-    dayjs().subtract(1, 'hour').locale('en').format('YYYY-MM-DDTHH:mm'),
-  );
-  const [customTo, setCustomTo] = useState(() => dayjs().locale('en').format('YYYY-MM-DDTHH:mm'));
+  const [period, setPeriod] = useState(searchParams.get('period') || 'today');
+  const [customFrom, setCustomFrom] = useState(dayjs().subtract(1, 'hour').locale('en').format('YYYY-MM-DDTHH:mm'));
+  const [customTo, setCustomTo] = useState(dayjs().locale('en').format('YYYY-MM-DDTHH:mm'));
   const [selectedOption, setSelectedOption] = useState('json');
 
   const [description, setDescription] = useState();
@@ -74,6 +75,9 @@ const ReportFilter = ({ children, onShow, onExport, onSchedule, deviceType, load
       return true;
     }
     if (selectedOption === 'schedule' && (!description || !calendarId)) {
+      return true;
+    }
+    if (!deviceIds.length && location.pathname.includes('replay')) {
       return true;
     }
     return loading;
@@ -100,9 +104,9 @@ const ReportFilter = ({ children, onShow, onExport, onSchedule, deviceType, load
 
   useEffect(() => {
     if (from && to) {
-      onShow({ deviceIds: deviceIds.filter((it) => it !== 'all'), groupIds, from, to });
+      onShow({ deviceIds, groupIds, from, to, eventTypes, alarmTypes });
     }
-  }, [deviceIds, groupIds, from, to, onShow]);
+  }, [deviceIds, groupIds, from, to, eventTypes, alarmTypes]);
 
   const showReport = () => {
     let selectedFrom;
@@ -141,6 +145,7 @@ const ReportFilter = ({ children, onShow, onExport, onSchedule, deviceType, load
     const newParams = new URLSearchParams(searchParams);
     newParams.set('from', selectedFrom.toISOString());
     newParams.set('to', selectedTo.toISOString());
+    newParams.set('period', period);
     setSearchParams(newParams, { replace: true });
   };
 
@@ -210,7 +215,7 @@ const ReportFilter = ({ children, onShow, onExport, onSchedule, deviceType, load
           />
         </div>
       )}
-      {deviceType === 'multiple' && (
+      {includeGroups && (
         <div className={classes.filterItem}>
           <SelectField
             label={t('settingsGroups')}

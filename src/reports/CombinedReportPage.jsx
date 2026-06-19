@@ -30,17 +30,14 @@ const CombinedReportPage = () => {
   const [loading, setLoading] = useState(false);
 
   const itemsCoordinates = useMemo(() => items.flatMap((item) => item.route), [items]);
-
-  const createMarkers = () =>
-    items.flatMap((item) =>
-      item.events
-        .map((event) => item.positions.find((p) => event.positionId === p.id))
-        .filter((position) => position != null)
-        .map((position) => ({
-          latitude: position.latitude,
-          longitude: position.longitude,
-        })),
-    );
+  
+  const createMarkers = () => items.flatMap((item) => item.events
+    .map((event) => item.positions.find((p) => event.positionId === p.id))
+    .filter((position) => position != null)
+    .map((position) => ({
+      latitude: position.latitude,
+      longitude: position.longitude,
+    })));
 
   const onShow = useCatchCallback(async ({ deviceIds, groupIds, from, to }) => {
     const query = new URLSearchParams({ from, to });
@@ -81,7 +78,7 @@ const CombinedReportPage = () => {
         )}
         <div className={classes.containerMain}>
           <div className={classes.header}>
-            <ReportFilter onShow={onShow} deviceType="multiple" loading={loading} />
+            <ReportFilter onShow={onShow} deviceType="multiple" includeGroups loading={loading} />
           </div>
           <Table>
             <TableHead>

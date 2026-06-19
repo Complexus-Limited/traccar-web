@@ -90,22 +90,16 @@ const BottomMenu = () => {
     dispatch(sessionActions.updateUser(null));
   };
 
+  const deviceId = useSelector((state) => state.devices.selectedId);
+
   const handleSelection = (event, value) => {
     switch (value) {
       case 'map':
         navigate('/');
         break;
-      case 'reports': {
-        let id = selectedDeviceId;
-        if (id == null) {
-          const deviceIds = Object.keys(devices);
-          if (deviceIds.length === 1) {
-            id = deviceIds[0];
-          }
-        }
-
-        if (id != null) {
-          navigate(`/reports/combined?deviceId=${id}`);
+      case 'reports':
+        if (deviceId) {
+          navigate('/reports/combined?deviceId=' + deviceId);
         } else {
           navigate('/reports/combined');
         }
