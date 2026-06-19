@@ -7,7 +7,7 @@ export default makeStyles()((theme) => ({
     flexDirection: 'column',
   },
   containerMap: {
-    flexBasis: '40%',
+    flexBasis: 'var(--report-map-height, 40%)',
     flexShrink: 0,
   },
   containerMain: {
@@ -26,6 +26,9 @@ export default makeStyles()((theme) => ({
     '@media print': {
       display: 'none',
     },
+  },
+  columnActionContainer: {
+    display: 'flex',
   },
   filter: {
     display: 'inline-flex',

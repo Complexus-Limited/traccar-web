@@ -1,10 +1,15 @@
 import dayjs from 'dayjs';
 import { useState } from 'react';
+import { FormControl, InputLabel, Select, MenuItem, useTheme } from '@mui/material';
 import {
-  FormControl, InputLabel, Select, MenuItem, useTheme,
-} from '@mui/material';
-import {
-  Brush, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis,
+  Brush,
+  CartesianGrid,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
 } from 'recharts';
 import ReportFilter from './components/ReportFilter';
 import { formatTime } from '../common/util/formatter';
@@ -12,10 +17,14 @@ import { useTranslation } from '../common/components/LocalizationProvider';
 import PageLayout from '../common/components/PageLayout';
 import ReportsMenu from './components/ReportsMenu';
 import usePositionAttributes from '../common/attributes/usePositionAttributes';
-import { useCatch } from '../reactHelper';
+import { useCatchCallback } from '../reactHelper';
 import { useAttributePreference } from '../common/util/preferences';
 import {
-  altitudeFromMeters, distanceFromMeters, speedFromKnots, speedToKnots, volumeFromLiters,
+  altitudeFromMeters,
+  distanceFromMeters,
+  speedFromKnots,
+  speedToKnots,
+  volumeFromLiters,
 } from '../common/util/converter';
 import useReportStyles from './common/useReportStyles';
 import fetchOrThrow from '../common/util/fetchOrThrow';
@@ -37,7 +46,9 @@ const ChartReportPage = () => {
   const [selectedTypes, setSelectedTypes] = useState(['speed']);
   const [timeType, setTimeType] = useState('fixTime');
 
-  const values = items.map((it) => selectedTypes.map((type) => it[type]).filter((value) => value != null));
+  const values = items.map((it) =>
+    selectedTypes.map((type) => it[type]).filter((value) => value != null),
+  );
   const minValue = values.length ? Math.min(...values) : 0;
   const maxValue = values.length ? Math.max(...values) : 100;
   const valueRange = maxValue - minValue;
@@ -120,7 +131,7 @@ const ChartReportPage = () => {
 
   return (
     <PageLayout menu={<ReportsMenu />} breadcrumbs={['reportTitle', 'reportChart']}>
-      <ReportFilter onShow={onShow} deviceType="single">
+      <ReportFilter onShow={onShow} onExport={() => {}} deviceType="single" formats={[]}>
         <div className={classes.filterItem}>
           <FormControl fullWidth>
             <InputLabel>{t('reportChartType')}</InputLabel>
@@ -132,7 +143,9 @@ const ChartReportPage = () => {
               disabled={!items.length}
             >
               {types.map((key) => (
-                <MenuItem key={key} value={key}>{positionAttributes[key]?.name || key}</MenuItem>
+                <MenuItem key={key} value={key}>
+                  {positionAttributes[key]?.name || key}
+                </MenuItem>
               ))}
             </Select>
           </FormControl>
@@ -160,7 +173,10 @@ const ChartReportPage = () => {
               key={timeType + selectedTypes.join(',') + items.length} // forces re-render
               data={items}
               margin={{
-                top: 10, right: 40, left: 0, bottom: 10,
+                top: 10,
+                right: 40,
+                left: 10,
+                bottom: 10,
               }}
             >
               <XAxis
@@ -174,12 +190,15 @@ const ChartReportPage = () => {
               <YAxis
                 stroke={theme.palette.text.primary}
                 type="number"
-                tickFormatter={(value) => value.toFixed(2)}
+                tickFormatter={(value) => parseFloat(value.toFixed(2))}
                 domain={[minValue - valueRange / 5, maxValue + valueRange / 5]}
               />
               <CartesianGrid stroke={theme.palette.divider} strokeDasharray="3 3" />
               <Tooltip
-                wrapperStyle={{ backgroundColor: theme.palette.background.default, color: theme.palette.text.primary }}
+                contentStyle={{
+                  backgroundColor: theme.palette.background.default,
+                  color: theme.palette.text.primary,
+                }}
                 formatter={(value, key) => [value, positionAttributes[key]?.name || key]}
                 labelFormatter={(value) => formatTime(value, 'seconds')}
               />
@@ -193,6 +212,7 @@ const ChartReportPage = () => {
               />
               {selectedTypes.map((type, index) => (
                 <Line
+                  key={type}
                   type="monotone"
                   dataKey={type}
                   stroke={colorPalette[index % colorPalette.length]}

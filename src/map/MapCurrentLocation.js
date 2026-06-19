@@ -12,11 +12,11 @@ const MapCurrentLocation = () => {
         enableHighAccuracy: true,
         timeout: 5000,
       },
-      trackUserLocation: true,
+      trackUserLocation: false,
     });
     map.addControl(control, theme.direction === 'rtl' ? 'top-left' : 'top-right');
     return () => map.removeControl(control);
-  }, []);
+  }, [theme.direction]);
 
   return null;
 };

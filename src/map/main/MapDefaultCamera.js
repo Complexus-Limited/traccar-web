@@ -3,8 +3,9 @@ import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { usePreference } from '../../common/util/preferences';
 import { map } from '../core/MapView';
+import { toMapCoordinates } from '../core/mapUtil';
 
-const MapDefaultCamera = ({ mapReady }) => {
+const MapDefaultCamera = ({ filteredPositions }) => {
   const selectedDeviceId = useSelector((state) => state.devices.selectedId);
   const positions = useSelector((state) => state.session.positions);
 
@@ -15,20 +16,32 @@ const MapDefaultCamera = ({ mapReady }) => {
   const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
-    if (!mapReady) return;
+    if (initialized) return;
     if (selectedDeviceId) {
-      setInitialized(true);
-    } else if (!initialized) {
+      const position = positions[selectedDeviceId];
+      if (position) {
+        map.jumpTo({
+          center: toMapCoordinates(position.longitude, position.latitude),
+          zoom: Math.max(defaultZoom > 0 ? defaultZoom : map.getZoom(), 10),
+        });
+        setInitialized(true);
+      }
+    } else {
       if (defaultLatitude && defaultLongitude) {
         map.jumpTo({
-          center: [defaultLongitude, defaultLatitude],
+          center: toMapCoordinates(defaultLongitude, defaultLatitude),
           zoom: defaultZoom,
         });
         setInitialized(true);
       } else {
-        const coordinates = Object.values(positions).map((item) => [item.longitude, item.latitude]);
+        const coordinates = (filteredPositions || Object.values(positions)).map((item) =>
+          toMapCoordinates(item.longitude, item.latitude),
+        );
         if (coordinates.length > 1) {
-          const bounds = coordinates.reduce((bounds, item) => bounds.extend(item), new maplibregl.LngLatBounds(coordinates[0], coordinates[1]));
+          const bounds = coordinates.reduce(
+            (bounds, item) => bounds.extend(item),
+            new maplibregl.LngLatBounds(coordinates[0], coordinates[1]),
+          );
           const canvas = map.getCanvas();
           map.fitBounds(bounds, {
             duration: 0,
@@ -39,17 +52,23 @@ const MapDefaultCamera = ({ mapReady }) => {
           const [individual] = coordinates;
           map.jumpTo({
             center: individual,
-            zoom: Math.max(map.getZoom(), 10),
+            zoom: Math.max(defaultZoom > 0 ? defaultZoom : map.getZoom(), 10),
           });
           setInitialized(true);
         }
       }
     }
-  }, [selectedDeviceId, initialized, defaultLatitude, defaultLongitude, defaultZoom, positions, mapReady]);
+  }, [
+    selectedDeviceId,
+    initialized,
+    defaultLatitude,
+    defaultLongitude,
+    defaultZoom,
+    positions,
+    filteredPositions,
+  ]);
 
   return null;
 };
-
-MapDefaultCamera.handlesMapReady = true;
 
 export default MapDefaultCamera;

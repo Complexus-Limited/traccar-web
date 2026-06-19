@@ -1,7 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import {
-  FormControl, InputLabel, Select, MenuItem, Button, TextField, Typography,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Button,
+  TextField,
+  Typography,
 } from '@mui/material';
 import { useSelector } from 'react-redux';
 import dayjs from 'dayjs';
@@ -11,6 +17,7 @@ import SplitButton from '../../common/components/SplitButton';
 import SelectField from '../../common/components/SelectField';
 import { useRestriction } from '../../common/util/permissions';
 //import ReplayPage from '../../other/ReplayPage';
+import { deviceEquality } from '../../common/util/deviceEquality';
 
 export const updateReportParams = (searchParams, setSearchParams, key, values) => {
   const newParams = new URLSearchParams(searchParams);
@@ -31,10 +38,24 @@ const ReportFilter = ({
 
   const readonly = useRestriction('readonly');
 
-  const devices = useSelector((state) => state.devices.items);
+  const devices = useSelector((state) => state.devices.items, deviceEquality(['id', 'name']));
   const groups = useSelector((state) => state.groups.items);
+  const deviceList = useMemo(
+    () => [
+      { id: 'all', name: t('notificationAlways') },
+      ...Object.values(devices).sort((a, b) => a.name.localeCompare(b.name)),
+    ],
+    [devices, t],
+  );
+  const groupList = useMemo(
+    () => Object.values(groups).sort((a, b) => a.name.localeCompare(b.name)),
+    [groups],
+  );
 
-  const deviceIds = useMemo(() => searchParams.getAll('deviceId').map(Number), [searchParams]);
+  const deviceIds = useMemo(
+    () => searchParams.getAll('deviceId').map((it) => (it === 'all' ? it : Number(it))),
+    [searchParams],
+  );
   const groupIds = useMemo(() => searchParams.getAll('groupId').map(Number), [searchParams]);
   const from = searchParams.get('from');
   const to = searchParams.get('to');
@@ -47,7 +68,10 @@ const ReportFilter = ({
   const [calendarId, setCalendarId] = useState();
 
   const evaluateDisabled = () => {
-    if (deviceType !== 'none' && !deviceIds.length && !groupIds.length) {
+    if (deviceType === 'single' && !deviceIds.length) {
+      return true;
+    }
+    if (deviceType === 'multiple' && !deviceIds.length && !groupIds.length) {
       return true;
     }
     if (selectedOption === 'schedule' && (!description || !calendarId)) {
@@ -57,7 +81,7 @@ const ReportFilter = ({
       return true;
     }
     return loading;
-  }
+  };
   const disabled = evaluateDisabled();
   const loaded = from && to && !loading;
 
@@ -66,14 +90,16 @@ const ReportFilter = ({
       json: t('reportShow'),
     };
     if (onExport && loaded) {
-      result.export = t('reportExport');
+      formats.forEach((format) => {
+        result[format] = `${t('reportExport')} (${format.toUpperCase()})`;
+      });
       result.print = t('reportPrint');
     }
     if (onSchedule && !readonly) {
       result.schedule = t('reportSchedule');
     }
     return result;
-  }
+  };
   const options = evaluateOptions();
 
   useEffect(() => {
@@ -125,8 +151,18 @@ const ReportFilter = ({
 
   const onSelected = (type) => {
     switch (type) {
-      case 'export':
-        onExport({ deviceIds, groupIds, from, to });
+      case 'xlsx':
+      case 'csv':
+      case 'gpx':
+      case 'kml':
+      case 'kmz':
+        onExport({
+          deviceIds: deviceIds.filter((it) => it !== 'all'),
+          groupIds,
+          from,
+          to,
+          format: type,
+        });
         break;
       case 'print':
         window.print();
@@ -135,16 +171,20 @@ const ReportFilter = ({
         setSelectedOption(type);
         break;
     }
-  }
+  };
 
   const onClick = (type) => {
     switch (type) {
       case 'schedule':
-        onSchedule(deviceIds, groupIds, {
-          description,
-          calendarId,
-          attributes: {},
-        });
+        onSchedule(
+          deviceIds.filter((it) => it !== 'all'),
+          groupIds,
+          {
+            description,
+            calendarId,
+            attributes: {},
+          },
+        );
         break;
       case 'json':
       default:
@@ -159,13 +199,18 @@ const ReportFilter = ({
         <div className={classes.filterItem}>
           <SelectField
             label={t(deviceType === 'multiple' ? 'deviceTitle' : 'reportDevice')}
-            data={Object.values(devices).sort((a, b) => a.name.localeCompare(b.name))}
+            data={
+              deviceType === 'multiple' ? deviceList : deviceList.filter((it) => it.id !== 'all')
+            }
             value={deviceType === 'multiple' ? deviceIds : deviceIds.find(() => true)}
+            allValue="all"
             onChange={(e) => {
-              const values = deviceType === 'multiple' ? e.target.value : [e.target.value].filter((id) => id);
+              const values =
+                deviceType === 'multiple' ? e.target.value : [e.target.value].filter((id) => id);
               updateReportParams(searchParams, setSearchParams, 'deviceId', values);
             }}
             multiple={deviceType === 'multiple'}
+            singleLine={deviceType === 'multiple'}
             fullWidth
           />
         </div>
@@ -174,13 +219,14 @@ const ReportFilter = ({
         <div className={classes.filterItem}>
           <SelectField
             label={t('settingsGroups')}
-            data={Object.values(groups).sort((a, b) => a.name.localeCompare(b.name))}
+            data={groupList}
             value={groupIds}
             onChange={(e) => {
               const values = e.target.value;
               updateReportParams(searchParams, setSearchParams, 'groupId', values);
             }}
             multiple
+            singleLine
             fullWidth
           />
         </div>
@@ -190,7 +236,11 @@ const ReportFilter = ({
           <div className={classes.filterItem}>
             <FormControl fullWidth>
               <InputLabel>{t('reportPeriod')}</InputLabel>
-              <Select label={t('reportPeriod')} value={period} onChange={(e) => setPeriod(e.target.value)}>
+              <Select
+                label={t('reportPeriod')}
+                value={period}
+                onChange={(e) => setPeriod(e.target.value)}
+              >
                 <MenuItem value="today">{t('reportToday')}</MenuItem>
                 <MenuItem value="yesterday">{t('reportYesterday')}</MenuItem>
                 <MenuItem value="thisWeek">{t('reportThisWeek')}</MenuItem>
@@ -255,7 +305,9 @@ const ReportFilter = ({
             disabled={disabled}
             onClick={onClick}
           >
-            <Typography variant="button" noWrap>{t(loading ? 'sharedLoading' : 'reportShow')}</Typography>
+            <Typography variant="button" noWrap>
+              {t(loading ? 'sharedLoading' : 'reportShow')}
+            </Typography>
           </Button>
         ) : (
           <SplitButton

@@ -14,8 +14,9 @@ import PageLayout from '../common/components/PageLayout';
 import ReportsMenu from './components/ReportsMenu';
 import PositionValue from '../common/components/PositionValue';
 import ColumnSelect from './components/ColumnSelect';
+import ResizeHandle from './components/ResizeHandle';
 import usePositionAttributes from '../common/attributes/usePositionAttributes';
-import { useCatch } from '../reactHelper';
+import { useCatch, useCatchCallback } from '../reactHelper';
 import MapView from '../map/core/MapView';
 import MapRoutePath from '../map/MapRoutePath';
 import MapRoutePoints from '../map/MapRoutePoints';
@@ -45,7 +46,9 @@ const PositionsReportPage = () => {
   const [available, setAvailable] = useState([]);
   const [columns, setColumns] = useState(['fixTime', 'latitude', 'longitude', 'speed', 'address']);
   const [items, setItems] = useState([]);
-  const geofenceId = searchParams.has('geofenceId') ? parseInt(searchParams.get('geofenceId')) : null;
+  const geofenceId = searchParams.has('geofenceId')
+    ? parseInt(searchParams.get('geofenceId'))
+    : null;
   const [loading, setLoading] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
 
@@ -55,10 +58,10 @@ const PositionsReportPage = () => {
   const selectedIcon = useRef();
 
   useEffect(() => {
-    if (selectedIcon.current) {
-      selectedIcon.current.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    if (selectedRef.current) {
+      selectedRef.current.scrollIntoView({ block: 'center', behavior: 'smooth' });
     }
-  }, [selectedIcon.current]);
+  }, [selectedItem]);
 
   const onMapPointClick = useCallback((positionId) => {
     setSelectedItem(items.find((it) => it.id === positionId));
@@ -97,13 +100,13 @@ const PositionsReportPage = () => {
     }
   });
 
-  const onExport = useCatch(async ({ deviceIds, from, to }) => {
+  const onExport = useCatch(async ({ deviceIds, from, to, format }) => {
     const query = new URLSearchParams({ from, to });
     if (geofenceId) {
-      query.append('geofenceId', geofenceId)
+      query.append('geofenceId', geofenceId);
     }
     deviceIds.forEach((deviceId) => query.append('deviceId', deviceId));
-    window.location.assign(`/api/positions/csv?${query.toString()}`);
+    window.location.assign(`/api/positions/${format}?${query.toString()}`);
   });
 
   const onSchedule = useCatch(async (deviceIds, groupIds, report) => {
@@ -125,27 +128,37 @@ const PositionsReportPage = () => {
     <PageLayout menu={<ReportsMenu />} breadcrumbs={['reportTitle', 'reportPositions']}>
       <div className={classes.container}>
         {selectedItem && (
-          <div className={classes.containerMap}>
-            <MapView>
-              <MapGeofence />
-              {[...new Set(items.map((it) => it.deviceId))].map((deviceId) => {
-                const positions = items.filter((position) => position.deviceId === deviceId);
-                return (
-                  <Fragment key={deviceId}>
-                    <MapRoutePath positions={positions} />
-                    <MapRoutePoints positions={positions} onClick={onMapPointClick} />
-                  </Fragment>
-                );
-              })}
-              <MapPositions positions={[selectedItem]} titleField="fixTime" />
-            </MapView>
-            <MapScale />
-            <MapCamera positions={items} />
-          </div>
+          <>
+            <div className={classes.containerMap}>
+              <MapView>
+                <MapGeofence />
+                {[...new Set(items.map((it) => it.deviceId))].map((deviceId) => {
+                  const positions = items.filter((position) => position.deviceId === deviceId);
+                  return (
+                    <Fragment key={deviceId}>
+                      <MapRoutePath positions={positions} />
+                      <MapRoutePoints positions={positions} onClick={onMapPointClick} />
+                    </Fragment>
+                  );
+                })}
+                <MapPositions positions={[selectedItem]} titleField="fixTime" />
+              </MapView>
+              <MapScale />
+              <MapCamera positions={items} />
+            </div>
+            <ResizeHandle />
+          </>
         )}
         <div className={classes.containerMain}>
           <div className={classes.header}>
-            <ReportFilter onShow={onShow} onExport={onExport} onSchedule={onSchedule} deviceType="single" loading={loading}>
+            <ReportFilter
+              onShow={onShow}
+              onExport={onExport}
+              onSchedule={onSchedule}
+              deviceType="single"
+              loading={loading}
+              formats={['csv', 'gpx', 'kml', 'kmz']}
+            >
               <div className={classes.filterItem}>
                 <SelectField
                   value={geofenceId}
@@ -171,7 +184,9 @@ const PositionsReportPage = () => {
             <TableHead>
               <TableRow>
                 <TableCell className={classes.columnAction} />
-                {columns.map((key) => (<TableCell key={key}>{positionAttributes[key]?.name || key}</TableCell>))}
+                {columns.map((key) => (
+                  <TableCell key={key}>{positionAttributes[key]?.name || key}</TableCell>
+                ))}
                 <TableCell className={classes.columnAction} />
               </TableRow>
             </TableHead>
@@ -197,19 +212,11 @@ const PositionsReportPage = () => {
                         attribute={item.hasOwnProperty(key) ? null : key}
                       />
                     </TableCell>
-                  ))}
-                  <TableCell className={classes.actionCellPadding}>
-                    <CollectionActions
-                      itemId={item.id}
-                      endpoint="positions"
-                      readonly={readonly}
-                      setTimestamp={() => {
-                        setItems(items.filter((position) => position.id !== item.id));
-                      }}
-                    />
-                  </TableCell>
-                </TableRow>
-              )) : (<TableShimmer columns={columns.length + 1} startAction />)}
+                  </TableRow>
+                ))
+              ) : (
+                <TableShimmer columns={columns.length + 1} startAction />
+              )}
             </TableBody>
           </Table>
           <TablePagination

@@ -2,11 +2,12 @@ import { useId, useEffect, useState } from 'react';
 import { kml } from '@tmcw/togeojson';
 import { useTheme } from '@mui/material/styles';
 import { map } from '../core/MapView';
-import { useEffectAsync } from '../../reactHelper';
+import { useAsyncTask } from '../../reactHelper';
 import { usePreference } from '../../common/util/preferences';
+import gcoord from 'gcoord';
 import { findFonts } from '../core/mapUtil';
 
-const PoiMap = ({ mapReady }) => {
+const PoiMap = () => {
   const id = useId();
 
   const theme = useTheme();
@@ -15,19 +16,35 @@ const PoiMap = ({ mapReady }) => {
 
   const [data, setData] = useState(null);
 
-  useEffectAsync(async () => {
-    if (poiLayer) {
-      const file = await fetch(poiLayer);
-      const dom = new DOMParser().parseFromString(await file.text(), 'text/xml');
-      setData(kml(dom));
-    }
-  }, [poiLayer]);
+  useAsyncTask(
+    async ({ signal }) => {
+      if (poiLayer) {
+        const file = await fetch(poiLayer, { signal });
+        const dom = new DOMParser().parseFromString(await file.text(), 'text/xml');
+        setData(kml(dom));
+      }
+    },
+    [poiLayer],
+  );
 
   useEffect(() => {
-    if (data && mapReady) {
+    if (data) {
       map.addSource(id, {
         type: 'geojson',
-        data,
+        data:
+          map.coordinateSystem === 'gcj02'
+            ? gcoord.transform(structuredClone(data), gcoord.WGS84, gcoord.GCJ02)
+            : data,
+      });
+      map.addLayer({
+        source: id,
+        id: 'poi-fill',
+        type: 'fill',
+        filter: ['==', '$type', 'Polygon'],
+        paint: {
+          'fill-color': ['coalesce', ['get', 'fill'], theme.palette.geometry.main],
+          'fill-opacity': ['coalesce', ['get', 'fill-opacity'], 0.3],
+        },
       });
       map.addLayer({
         source: id,
@@ -35,7 +52,7 @@ const PoiMap = ({ mapReady }) => {
         type: 'circle',
         paint: {
           'circle-radius': 5,
-          'circle-color': theme.palette.geometry.main,
+          'circle-color': ['coalesce', ['get', 'icon-color'], theme.palette.geometry.main],
         },
       });
       map.addLayer({
@@ -43,8 +60,9 @@ const PoiMap = ({ mapReady }) => {
         id: 'poi-line',
         type: 'line',
         paint: {
-          'line-color': theme.palette.geometry.main,
-          'line-width': 2,
+          'line-color': ['coalesce', ['get', 'stroke'], theme.palette.geometry.main],
+          'line-width': ['coalesce', ['get', 'stroke-width'], 2],
+          'line-opacity': ['coalesce', ['get', 'stroke-opacity'], 1],
         },
       });
       map.addLayer({
@@ -64,14 +82,17 @@ const PoiMap = ({ mapReady }) => {
         },
       });
       return () => {
-        if (map.getLayer('poi-point')) {
-          map.removeLayer('poi-point');
+        if (map.getLayer('poi-title')) {
+          map.removeLayer('poi-title');
         }
         if (map.getLayer('poi-line')) {
           map.removeLayer('poi-line');
         }
-        if (map.getLayer('poi-title')) {
-          map.removeLayer('poi-title');
+        if (map.getLayer('poi-point')) {
+          map.removeLayer('poi-point');
+        }
+        if (map.getLayer('poi-fill')) {
+          map.removeLayer('poi-fill');
         }
         if (map.getSource(id)) {
           map.removeSource(id);
@@ -79,11 +100,9 @@ const PoiMap = ({ mapReady }) => {
       };
     }
     return () => {};
-  }, [data, mapReady]);
+  }, [data, id, theme.palette.geometry.main]);
 
   return null;
 };
-
-PoiMap.handlesMapReady = true;
 
 export default PoiMap;

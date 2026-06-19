@@ -1,67 +1,75 @@
-import {
-  createContext, useContext, useEffect, useMemo,
-} from 'react';
+import { createContext, use, useEffect, useMemo, Suspense } from 'react';
 import { useSelector } from 'react-redux';
 import dayjs from 'dayjs';
 import usePersistedState from '../util/usePersistedState';
+import Loader from './Loader';
 
-import af from '../../resources/l10n/af.json'; import 'dayjs/locale/af';
-import ar from '../../resources/l10n/ar.json'; import 'dayjs/locale/ar';
-import az from '../../resources/l10n/az.json'; import 'dayjs/locale/az';
-import bg from '../../resources/l10n/bg.json'; import 'dayjs/locale/bg';
-import bn from '../../resources/l10n/bn.json'; import 'dayjs/locale/bn';
-import ca from '../../resources/l10n/ca.json'; import 'dayjs/locale/ca';
-import cs from '../../resources/l10n/cs.json'; import 'dayjs/locale/cs';
-import da from '../../resources/l10n/da.json'; import 'dayjs/locale/da';
-import de from '../../resources/l10n/de.json'; import 'dayjs/locale/de';
-import el from '../../resources/l10n/el.json'; import 'dayjs/locale/el';
-import en from '../../resources/l10n/en.json'; import 'dayjs/locale/en';
-import es from '../../resources/l10n/es.json'; import 'dayjs/locale/es';
-import fa from '../../resources/l10n/fa.json'; import 'dayjs/locale/fa';
-import fi from '../../resources/l10n/fi.json'; import 'dayjs/locale/fi';
-import fr from '../../resources/l10n/fr.json'; import 'dayjs/locale/fr';
-import gl from '../../resources/l10n/gl.json'; import 'dayjs/locale/gl';
-import he from '../../resources/l10n/he.json'; import 'dayjs/locale/he';
-import hi from '../../resources/l10n/hi.json'; import 'dayjs/locale/hi';
-import hr from '../../resources/l10n/hr.json'; import 'dayjs/locale/hr';
-import hu from '../../resources/l10n/hu.json'; import 'dayjs/locale/hu';
-import id from '../../resources/l10n/id.json'; import 'dayjs/locale/id';
-import it from '../../resources/l10n/it.json'; import 'dayjs/locale/it';
-import ja from '../../resources/l10n/ja.json'; import 'dayjs/locale/ja';
-import ka from '../../resources/l10n/ka.json'; import 'dayjs/locale/ka';
-import kk from '../../resources/l10n/kk.json'; import 'dayjs/locale/kk';
-import km from '../../resources/l10n/km.json'; import 'dayjs/locale/km';
-import ko from '../../resources/l10n/ko.json'; import 'dayjs/locale/ko';
-import lo from '../../resources/l10n/lo.json'; import 'dayjs/locale/lo';
-import lt from '../../resources/l10n/lt.json'; import 'dayjs/locale/lt';
-import lv from '../../resources/l10n/lv.json'; import 'dayjs/locale/lv';
-import mk from '../../resources/l10n/mk.json'; import 'dayjs/locale/mk';
-import ml from '../../resources/l10n/ml.json'; import 'dayjs/locale/ml';
-import mn from '../../resources/l10n/mn.json'; import 'dayjs/locale/mn';
-import ms from '../../resources/l10n/ms.json'; import 'dayjs/locale/ms';
-import nb from '../../resources/l10n/nb.json'; import 'dayjs/locale/nb';
-import ne from '../../resources/l10n/ne.json'; import 'dayjs/locale/ne';
-import nl from '../../resources/l10n/nl.json'; import 'dayjs/locale/nl';
-import nn from '../../resources/l10n/nn.json'; import 'dayjs/locale/nn';
-import pl from '../../resources/l10n/pl.json'; import 'dayjs/locale/pl';
-import pt from '../../resources/l10n/pt.json'; import 'dayjs/locale/pt';
-import pt_BR from '../../resources/l10n/pt_BR.json'; import 'dayjs/locale/pt-br';
-import ro from '../../resources/l10n/ro.json'; import 'dayjs/locale/ro';
-import ru from '../../resources/l10n/ru.json'; import 'dayjs/locale/ru';
-import si from '../../resources/l10n/si.json'; import 'dayjs/locale/si';
-import sk from '../../resources/l10n/sk.json'; import 'dayjs/locale/sk';
-import sl from '../../resources/l10n/sl.json'; import 'dayjs/locale/sl';
-import sq from '../../resources/l10n/sq.json'; import 'dayjs/locale/sq';
-import sr from '../../resources/l10n/sr.json'; import 'dayjs/locale/sr';
-import sv from '../../resources/l10n/sv.json'; import 'dayjs/locale/sv';
-import ta from '../../resources/l10n/ta.json'; import 'dayjs/locale/ta';
-import th from '../../resources/l10n/th.json'; import 'dayjs/locale/th';
-import tr from '../../resources/l10n/tr.json'; import 'dayjs/locale/tr';
-import uk from '../../resources/l10n/uk.json'; import 'dayjs/locale/uk';
-import uz from '../../resources/l10n/uz.json'; import 'dayjs/locale/uz';
-import vi from '../../resources/l10n/vi.json'; import 'dayjs/locale/vi';
-import zh from '../../resources/l10n/zh.json'; import 'dayjs/locale/zh';
-import zh_TW from '../../resources/l10n/zh_TW.json'; import 'dayjs/locale/zh-tw';
+import en from '../../resources/l10n/en.json';
+import 'dayjs/locale/en';
+
+const localeLoaders = import.meta.glob([
+  '../../resources/l10n/*.json',
+  '!../../resources/l10n/en.json',
+]);
+
+const dayjsLoaders = {
+  af: () => import('dayjs/locale/af.js'),
+  ar: () => import('dayjs/locale/ar.js'),
+  az: () => import('dayjs/locale/az.js'),
+  bg: () => import('dayjs/locale/bg.js'),
+  bn: () => import('dayjs/locale/bn.js'),
+  ca: () => import('dayjs/locale/ca.js'),
+  cs: () => import('dayjs/locale/cs.js'),
+  da: () => import('dayjs/locale/da.js'),
+  de: () => import('dayjs/locale/de.js'),
+  el: () => import('dayjs/locale/el.js'),
+  es: () => import('dayjs/locale/es.js'),
+  fa: () => import('dayjs/locale/fa.js'),
+  fi: () => import('dayjs/locale/fi.js'),
+  fr: () => import('dayjs/locale/fr.js'),
+  gl: () => import('dayjs/locale/gl.js'),
+  he: () => import('dayjs/locale/he.js'),
+  hi: () => import('dayjs/locale/hi.js'),
+  hr: () => import('dayjs/locale/hr.js'),
+  hu: () => import('dayjs/locale/hu.js'),
+  id: () => import('dayjs/locale/id.js'),
+  it: () => import('dayjs/locale/it.js'),
+  ja: () => import('dayjs/locale/ja.js'),
+  ka: () => import('dayjs/locale/ka.js'),
+  kk: () => import('dayjs/locale/kk.js'),
+  km: () => import('dayjs/locale/km.js'),
+  ko: () => import('dayjs/locale/ko.js'),
+  lo: () => import('dayjs/locale/lo.js'),
+  lt: () => import('dayjs/locale/lt.js'),
+  lv: () => import('dayjs/locale/lv.js'),
+  mk: () => import('dayjs/locale/mk.js'),
+  ml: () => import('dayjs/locale/ml.js'),
+  mn: () => import('dayjs/locale/mn.js'),
+  ms: () => import('dayjs/locale/ms.js'),
+  nb: () => import('dayjs/locale/nb.js'),
+  ne: () => import('dayjs/locale/ne.js'),
+  nl: () => import('dayjs/locale/nl.js'),
+  nn: () => import('dayjs/locale/nn.js'),
+  pl: () => import('dayjs/locale/pl.js'),
+  pt: () => import('dayjs/locale/pt.js'),
+  pt_BR: () => import('dayjs/locale/pt-br.js'),
+  ro: () => import('dayjs/locale/ro.js'),
+  ru: () => import('dayjs/locale/ru.js'),
+  si: () => import('dayjs/locale/si.js'),
+  sk: () => import('dayjs/locale/sk.js'),
+  sl: () => import('dayjs/locale/sl.js'),
+  sq: () => import('dayjs/locale/sq.js'),
+  sr: () => import('dayjs/locale/sr.js'),
+  sv: () => import('dayjs/locale/sv.js'),
+  ta: () => import('dayjs/locale/ta.js'),
+  th: () => import('dayjs/locale/th.js'),
+  tr: () => import('dayjs/locale/tr.js'),
+  uk: () => import('dayjs/locale/uk.js'),
+  uz: () => import('dayjs/locale/uz.js'),
+  vi: () => import('dayjs/locale/vi.js'),
+  zh: () => import('dayjs/locale/zh.js'),
+  zh_TW: () => import('dayjs/locale/zh-tw.js'),
+};
 
 const languages = {
   af: { data: af, country: 'ZA', name: 'Afrikaans' },
@@ -148,55 +156,63 @@ const LocalizationContext = createContext({
   languages,
   language: 'en',
   setLocalLanguage: () => {},
+  direction: 'ltr',
 });
+
+const ResolvedLocalizationProvider = ({ language, setLocalLanguage, children }) => {
+  const { data, dayjsName } = use(loadLocale(language));
+
+  const direction = /^(ar|he|fa)$/.test(language) ? 'rtl' : 'ltr';
+
+  const value = useMemo(
+    () => ({
+      languages: { ...languages, [language]: { ...languages[language], data } },
+      language,
+      setLocalLanguage,
+      direction,
+    }),
+    [language, data, setLocalLanguage, direction],
+  );
+
+  useEffect(() => {
+    dayjs.locale(dayjsName);
+    document.dir = direction;
+  }, [dayjsName, direction]);
+
+  return <LocalizationContext value={value}>{children}</LocalizationContext>;
+};
 
 export const LocalizationProvider = ({ children }) => {
   const remoteLanguage = useSelector((state) => {
     const serverLanguage = state.session.server?.attributes?.language;
     const userLanguage = state.session.user?.attributes?.language;
     const targetLanguage = userLanguage || serverLanguage;
-    return (targetLanguage && targetLanguage in languages) ? targetLanguage : null;
+    return targetLanguage && targetLanguage in languages ? targetLanguage : null;
   });
 
   const [localLanguage, setLocalLanguage] = usePersistedState('language', getDefaultLanguage());
 
   const language = remoteLanguage || localLanguage;
 
-  const direction = /^(ar|he|fa)$/.test(language) ? 'rtl' : 'ltr';
-
-  const value = useMemo(
-    () => ({ languages, language, setLocalLanguage, direction }),
-    [languages, language, setLocalLanguage, direction],
-  );
-
-  useEffect(() => {
-    let selected;
-    if (language.length > 2) {
-      selected = `${language.slice(0, 2)}-${language.slice(-2).toLowerCase()}`;
-    } else {
-      selected = language;
-    }
-    dayjs.locale(selected);
-    document.dir = direction;
-  }, [language, direction]);
-
   return (
-    <LocalizationContext.Provider value={value}>
-      {children}
-    </LocalizationContext.Provider>
+    <Suspense fallback={<Loader />}>
+      <ResolvedLocalizationProvider language={language} setLocalLanguage={setLocalLanguage}>
+        {children}
+      </ResolvedLocalizationProvider>
+    </Suspense>
   );
 };
 
-export const useLocalization = () => useContext(LocalizationContext);
+export const useLocalization = () => use(LocalizationContext);
 
 export const useTranslation = () => {
-  const context = useContext(LocalizationContext);
+  const context = use(LocalizationContext);
   const { data } = context.languages[context.language];
   return useMemo(() => (key) => data[key], [data]);
 };
 
 export const useTranslationKeys = (predicate) => {
-  const context = useContext(LocalizationContext);
+  const context = use(LocalizationContext);
   const { data } = context.languages[context.language];
   return Object.keys(data).filter(predicate);
 };

@@ -1,23 +1,26 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import {
-  IconButton,
-  Table, TableBody, TableCell, TableHead, TableRow,
-} from '@mui/material';
+import { useTheme } from '@mui/material/styles';
+import { IconButton, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import GpsFixedIcon from '@mui/icons-material/GpsFixed';
 import LocationSearchingIcon from '@mui/icons-material/LocationSearching';
 import {
-  formatDistance, formatVolume, formatTime, formatNumericHours,
+  formatAddress,
+  formatDistance,
+  formatVolume,
+  formatTime,
+  formatNumericHours,
 } from '../common/util/formatter';
 import ReportFilter from './components/ReportFilter';
-import { useAttributePreference } from '../common/util/preferences';
+import { useAttributePreference, usePreference } from '../common/util/preferences';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import PageLayout from '../common/components/PageLayout';
 import ReportsMenu from './components/ReportsMenu';
 import ColumnSelect from './components/ColumnSelect';
+import ResizeHandle from './components/ResizeHandle';
 import usePersistedState from '../common/util/usePersistedState';
-import { useCatch } from '../reactHelper';
+import { useCatch, useCatchCallback } from '../reactHelper';
 import useReportStyles from './common/useReportStyles';
 import MapPositions from '../map/MapPositions';
 import MapView from '../map/core/MapView';
@@ -28,6 +31,8 @@ import MapGeofence from '../map/MapGeofence';
 import scheduleReport from './common/scheduleReport';
 import MapScale from '../map/MapScale';
 import fetchOrThrow from '../common/util/fetchOrThrow';
+import exportExcel from '../common/util/exportExcel';
+import { deviceEquality } from '../common/util/deviceEquality';
 
 const columnsArray = [
   ['startTime', 'reportStartTime'],
@@ -44,18 +49,25 @@ const StopReportPage = () => {
   const navigate = useNavigate();
   const { classes } = useReportStyles();
   const t = useTranslation();
+  const theme = useTheme();
 
-  const devices = useSelector((state) => state.devices.items);
+  const devices = useSelector((state) => state.devices.items, deviceEquality(['id', 'name']));
 
   const distanceUnit = useAttributePreference('distanceUnit');
   const volumeUnit = useAttributePreference('volumeUnit');
+  const coordinateFormat = usePreference('coordinateFormat');
 
-  const [columns, setColumns] = usePersistedState('stopColumns', ['startTime', 'endTime', 'startOdometer', 'address']);
+  const [columns, setColumns] = usePersistedState('stopColumns', [
+    'startTime',
+    'endTime',
+    'startOdometer',
+    'address',
+  ]);
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
 
-  const onShow = useCatch(async ({ deviceIds, groupIds, from, to }) => {
+  const onShow = useCatchCallback(async ({ deviceIds, groupIds, from, to }) => {
     const query = new URLSearchParams({ from, to });
     deviceIds.forEach((deviceId) => query.append('deviceId', deviceId));
     groupIds.forEach((groupId) => query.append('groupId', groupId));
@@ -68,13 +80,27 @@ const StopReportPage = () => {
     } finally {
       setLoading(false);
     }
-  });
+  }, []);
 
-  const onExport = useCatch(async ({ deviceIds, groupIds, from, to }) => {
-    const query = new URLSearchParams({ from, to });
-    deviceIds.forEach((deviceId) => query.append('deviceId', deviceId));
-    groupIds.forEach((groupId) => query.append('groupId', groupId));
-    window.location.assign(`/api/reports/stops/xlsx?${query.toString()}`);
+  const onExport = useCatch(async () => {
+    const sheets = new Map();
+    items.forEach((item) => {
+      const deviceName = devices[item.deviceId].name;
+      if (!sheets.has(deviceName)) {
+        sheets.set(deviceName, []);
+      }
+      const row = {};
+      columns.forEach((key) => {
+        const header = t(columnsMap.get(key));
+        if (key === 'address') {
+          row[header] = formatAddress(item, coordinateFormat);
+        } else {
+          row[header] = formatValue(item, key);
+        }
+      });
+      sheets.get(deviceName).push(row);
+    });
+    await exportExcel(t('reportStops'), 'stops.xlsx', sheets, theme);
   });
 
   const onSchedule = useCatch(async (deviceIds, groupIds, report) => {
@@ -100,7 +126,13 @@ const StopReportPage = () => {
       case 'spentFuel':
         return value > 0 ? formatVolume(value, volumeUnit, t) : null;
       case 'address':
-        return (<AddressValue latitude={item.latitude} longitude={item.longitude} originalAddress={value} />);
+        return (
+          <AddressValue
+            latitude={item.latitude}
+            longitude={item.longitude}
+            originalAddress={value}
+          />
+        );
       default:
         return value;
     }
@@ -110,22 +142,27 @@ const StopReportPage = () => {
     <PageLayout menu={<ReportsMenu />} breadcrumbs={['reportTitle', 'reportStops']}>
       <div className={classes.container}>
         {selectedItem && (
-          <div className={classes.containerMap}>
-            <MapView>
-              <MapGeofence />
-              <MapPositions
-                positions={[{
-                  deviceId: selectedItem.deviceId,
-                  fixTime: selectedItem.startTime,
-                  latitude: selectedItem.latitude,
-                  longitude: selectedItem.longitude,
-                }]}
-                titleField="fixTime"
-              />
-            </MapView>
-            <MapScale />
-            <MapCamera latitude={selectedItem.latitude} longitude={selectedItem.longitude} />
-          </div>
+          <>
+            <div className={classes.containerMap}>
+              <MapView>
+                <MapGeofence />
+                <MapPositions
+                  positions={[
+                    {
+                      deviceId: selectedItem.deviceId,
+                      fixTime: selectedItem.startTime,
+                      latitude: selectedItem.latitude,
+                      longitude: selectedItem.longitude,
+                    },
+                  ]}
+                  titleField="fixTime"
+                />
+              </MapView>
+              <MapScale />
+              <MapCamera latitude={selectedItem.latitude} longitude={selectedItem.longitude} />
+            </div>
+            <ResizeHandle />
+          </>
         )}
         <div className={classes.containerMain}>
           <div className={classes.header}>
@@ -138,31 +175,35 @@ const StopReportPage = () => {
               <TableRow>
                 <TableCell className={classes.columnAction} />
                 <TableCell>{t('sharedDevice')}</TableCell>
-                {columns.map((key) => (<TableCell key={key}>{t(columnsMap.get(key))}</TableCell>))}
+                {columns.map((key) => (
+                  <TableCell key={key}>{t(columnsMap.get(key))}</TableCell>
+                ))}
               </TableRow>
             </TableHead>
             <TableBody>
-              {!loading ? items.map((item) => (
-                <TableRow key={item.positionId}>
-                  <TableCell className={classes.columnAction} padding="none">
-                    {selectedItem === item ? (
-                      <IconButton size="small" onClick={() => setSelectedItem(null)}>
-                        <GpsFixedIcon fontSize="small" />
-                      </IconButton>
-                    ) : (
-                      <IconButton size="small" onClick={() => setSelectedItem(item)}>
-                        <LocationSearchingIcon fontSize="small" />
-                      </IconButton>
-                    )}
-                  </TableCell>
-                  <TableCell>{devices[item.deviceId].name}</TableCell>
-                  {columns.map((key) => (
-                    <TableCell key={key}>
-                      {formatValue(item, key)}
+              {!loading ? (
+                items.map((item) => (
+                  <TableRow key={item.positionId}>
+                    <TableCell className={classes.columnAction} padding="none">
+                      {selectedItem === item ? (
+                        <IconButton size="small" onClick={() => setSelectedItem(null)}>
+                          <GpsFixedIcon fontSize="small" />
+                        </IconButton>
+                      ) : (
+                        <IconButton size="small" onClick={() => setSelectedItem(item)}>
+                          <LocationSearchingIcon fontSize="small" />
+                        </IconButton>
+                      )}
                     </TableCell>
-                  ))}
-                </TableRow>
-              )) : (<TableShimmer columns={columns.length + 2} startAction />)}
+                    <TableCell>{devices[item.deviceId].name}</TableCell>
+                    {columns.map((key) => (
+                      <TableCell key={key}>{formatValue(item, key)}</TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableShimmer columns={columns.length + 2} startAction />
+              )}
             </TableBody>
           </Table>
         </div>

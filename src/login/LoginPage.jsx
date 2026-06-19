@@ -1,8 +1,18 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
-  useMediaQuery, Select, MenuItem, FormControl, Button, TextField, Link, Snackbar, IconButton, Tooltip, Box, InputAdornment,
+  useMediaQuery,
+  Select,
+  MenuItem,
+  FormControl,
+  Button,
+  TextField,
+  Link,
+  Snackbar,
+  IconButton,
+  Tooltip,
+  InputAdornment,
 } from '@mui/material';
-import ReactCountryFlag from 'react-country-flag';
+import CountryFlag from 'react-country-flag';
 import { makeStyles } from 'tss-react/mui';
 import CloseIcon from '@mui/icons-material/Close';
 import VpnLockIcon from '@mui/icons-material/VpnLock';
@@ -17,7 +27,10 @@ import { useLocalization, useTranslation } from '../common/components/Localizati
 import LoginLayout from './LoginLayout';
 import usePersistedState from '../common/util/usePersistedState';
 import {
-  generateLoginToken, handleLoginTokenListeners, nativeEnvironment, nativePostMessage,
+  generateLoginToken,
+  handleLoginTokenListeners,
+  nativeEnvironment,
+  nativePostMessage,
 } from '../common/components/NativeInterface';
 import LogoImage from './LogoImage';
 import { useCatch } from '../reactHelper';
@@ -51,6 +64,9 @@ const useStyles = makeStyles()((theme) => ({
   link: {
     cursor: 'pointer',
   },
+  flag: {
+    marginRight: theme.spacing(1),
+  },
 }));
 
 const LoginPage = () => {
@@ -61,7 +77,11 @@ const LoginPage = () => {
   const t = useTranslation();
 
   const { languages, language, setLocalLanguage } = useLocalization();
-  const languageList = Object.entries(languages).map((values) => ({ code: values[0], country: values[1].country, name: values[1].name }));
+  const languageList = Object.entries(languages).map((values) => ({
+    code: values[0],
+    country: values[1].country,
+    name: values[1].name,
+  }));
 
   const [failed, setFailed] = useState(false);
 
@@ -80,7 +100,9 @@ const LoginPage = () => {
   const changeEnabled = useSelector((state) => !state.session.server.attributes.disableChange);
   const emailEnabled = useSelector((state) => state.session.server.emailEnabled);
   const openIdEnabled = useSelector((state) => state.session.server.openIdEnabled);
-  const openIdForced = useSelector((state) => state.session.server.openIdEnabled && state.session.server.openIdForce);
+  const openIdForced = useSelector(
+    (state) => state.session.server.openIdEnabled && state.session.server.openIdForce,
+  );
   const [codeEnabled, setCodeEnabled] = useState(false);
 
   const [announcementShown, setAnnouncementShown] = useState(false);
@@ -120,6 +142,9 @@ const LoginPage = () => {
     navigate('/');
   });
 
+  const handleTokenLoginRef = useRef(handleTokenLogin);
+  handleTokenLoginRef.current = handleTokenLogin;
+
   const handleOpenIdLogin = () => {
     document.location = '/api/session/openid/auth';
   };
@@ -127,7 +152,7 @@ const LoginPage = () => {
   useEffect(() => nativePostMessage('authentication'), []);
 
   useEffect(() => {
-    const listener = (token) => handleTokenLogin(token);
+    const listener = (token) => handleTokenLoginRef.current(token);
     handleLoginTokenListeners.add(listener);
     return () => handleLoginTokenListeners.delete(listener);
   }, []);
@@ -163,9 +188,9 @@ const LoginPage = () => {
             <Select value={language} onChange={(e) => setLocalLanguage(e.target.value)}>
               {languageList.map((it) => (
                 <MenuItem key={it.code} value={it.code}>
-                  <Box component="span" sx={{ mr: 1 }}>
-                    <ReactCountryFlag countryCode={it.country} svg />
-                  </Box>
+                  <span className={classes.flag}>
+                    <CountryFlag countryCode={it.country} svg />
+                  </span>
                   {it.name}
                 </MenuItem>
               ))}
@@ -174,7 +199,9 @@ const LoginPage = () => {
         )}
       </div>
       <div className={classes.container}>
-        {useMediaQuery(theme.breakpoints.down('lg')) && <LogoImage color={theme.palette.primary.main} />}
+        {useMediaQuery(theme.breakpoints.down('lg')) && (
+          <LogoImage color={theme.palette.primary.main} />
+        )}
         {!openIdForced && (
           <>
             <TextField
@@ -237,11 +264,7 @@ const LoginPage = () => {
           </>
         )}
         {openIdEnabled && (
-          <Button
-            onClick={() => handleOpenIdLogin()}
-            variant="contained"
-            color="secondary"
-          >
+          <Button onClick={() => handleOpenIdLogin()} variant="contained" color="secondary">
             {t('loginOpenId')}
           </Button>
         )}
@@ -274,11 +297,11 @@ const LoginPage = () => {
       <Snackbar
         open={!!announcement && !announcementShown}
         message={announcement}
-        action={(
+        action={
           <IconButton size="small" color="inherit" onClick={() => setAnnouncementShown(true)}>
             <CloseIcon fontSize="small" />
           </IconButton>
-        )}
+        }
       />
     </LoginLayout>
   );
