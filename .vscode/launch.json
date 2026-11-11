@@ -23,6 +23,13 @@
       "request": "launch",
       "url": "http://localhost:3000",
       "webRoot": "${workspaceFolder}/src"
+    },
+    {
+      "name": "Debug Traccar Server",
+      "type": "java",
+      "request": "launch",
+      "mainClass": "org.traccar.Main",
+      "console": "integratedTerminal"
     }
   ]
 }
