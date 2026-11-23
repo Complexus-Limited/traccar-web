@@ -6,14 +6,23 @@
       "request": "launch",
       "runtimeArgs": ["start"],
       "runtimeExecutable": "npm",
-      "type": "node"
+      "type": "node",
+      "console": "integratedTerminal"
     },
     {
       "name": "npm run build",
       "request": "launch",
       "runtimeArgs": ["run", "build"],
       "runtimeExecutable": "npm",
-      "type": "node"
+      "type": "node",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Debug Traccar Web (Edge)",
+      "type": "msedge",
+      "request": "launch",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}/src"
     }
   ]
 }

@@ -18,6 +18,7 @@ import {
   formatVoltage,
   formatVolume,
   formatConsumption,
+  formatState,
 } from '../util/formatter';
 import { speedToKnots } from '../util/converter';
 import { useAttributePreference, usePreference } from '../util/preferences';
@@ -44,6 +45,8 @@ const PositionValue = ({ position, property, attribute }) => {
   const speedUnit = useAttributePreference('speedUnit');
   const volumeUnit = useAttributePreference('volumeUnit');
   const coordinateFormat = usePreference('coordinateFormat');
+  const hours12 = usePreference('twelveHourFormat');
+  const volumeUnitstring = usePreference('volumeUnit');
 
   const formatValue = () => {
     switch (key) {
@@ -61,29 +64,65 @@ const PositionValue = ({ position, property, attribute }) => {
         return formatCourse(value);
       case 'fuelConsumption':
         return formatConsumption(value, t);
+      case 'fuel':
+        return formatVolume(value, volumeUnitstring, t);
+      case 'charge':
+        return formatBoolean(value, t);
+      case 'status':
+        return formatState(value, t);
+      case 'rssi':
+        return value != null ? formatPercentage(value, t) : '';
+      case 'unplugged':
+      case 'manDown':  
+        return formatBoolean(value, t);
+      case 'intakeAirTemp':
+        return value != null ? formatTemperature(value) : '';
+      case 'maf':
+        return value != null ? formatTemperature(value) : '';
+      case 'throttle':
+        return value != null ? formatPercentage(value) : '';
       case 'coolantTemp':
         return formatTemperature(value);
+      case 'engineTemp':
+        return value != null ? formatTemperature(value) : '';
+      case 'hours':
+        return value != null ? formatNumericHours(value, t) : '';
+      case 'bleBattery1':
+        return value != null ? formatPercentage(value) : '';
+      case 'bleHumidity1':
+        return value != null ? formatPercentage(value) : '';
+      case 'egrError':
+        return value != null ? formatPercentage(value) : '';
+      case 'oilLevel':  
+        return formatBoolean(value, t);
+      case 'adBlueLevel':
+        return value != null ? formatPercentage(value) : '';
       case 'alarm':
         return formatAlarm(value, t);
       default:
         switch (positionAttributes[key]?.dataType) {
-          case 'altitude':
-            return formatAltitude(value, altitudeUnit, t);
-          case 'speed':
-            return formatSpeed(value, speedUnit, t);
-          case 'distance':
-            return formatDistance(value, distanceUnit, t);
-          case 'voltage':
-            return formatVoltage(value, t);
-          case 'energy':
-            return formatEnergy(value, t);
-          case 'percentage':
-            return formatPercentage(value);
-          case 'volume':
-            return formatVolume(value, volumeUnit, t);
-          case 'hours':
-            return formatNumericHours(value, t);
-          default:
+      case 'altitude':
+        return formatAltitude(value, altitudeUnit, t);
+      case 'speed':
+        return formatSpeed(value, speedUnit, t);
+      case 'odometer':
+      case 'serviceOdometer':
+      case 'tripOdometer':
+      case 'obdOdometer':
+      case 'distance':
+      case 'totalDistance':
+        return formatDistance(value, distanceUnit, t);
+      case 'voltage':
+        return formatVoltage(value, t);
+      case 'energy':
+        return formatEnergy(value, t);
+      case 'percentage':
+        return formatPercentage(value);
+      case 'volume':
+        return formatVolume(value, volumeUnit, t);
+      case 'hours':
+        return formatNumericHours(value, t);
+      default:
             if (typeof value === 'number') {
               return formatNumber(value);
             }

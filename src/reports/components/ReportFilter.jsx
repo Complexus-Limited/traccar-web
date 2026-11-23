@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import {
   FormControl,
   IconButton,
@@ -144,6 +144,7 @@ const ReportFilter = ({ children, onShow, onExport, onSchedule, deviceType, load
     newParams.set('period', period);
     newParams.set('from', selectedFrom.toISOString());
     newParams.set('to', selectedTo.toISOString());
+    newParams.set('period', period);
     setSearchParams(newParams, { replace: true });
   };
 
@@ -224,7 +225,7 @@ const ReportFilter = ({ children, onShow, onExport, onSchedule, deviceType, load
           />
         </div>
       )}
-      {deviceType === 'multiple' && (
+      {includeGroups && (
         <div className={classes.filterItem}>
           <SelectField
             label={t('settingsGroups')}

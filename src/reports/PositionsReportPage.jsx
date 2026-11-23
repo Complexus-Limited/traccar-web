@@ -117,6 +117,15 @@ const PositionsReportPage = () => {
     navigate('/reports/scheduled');
   });
 
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
   return (
     <PageLayout menu={<ReportsMenu />} breadcrumbs={['reportTitle', 'reportPositions']}>
       <div className={classes.container}>
@@ -228,6 +237,15 @@ const PositionsReportPage = () => {
               )}
             </TableBody>
           </Table>
+          <TablePagination
+            component="div"
+            count={items.length}
+            page={page}
+            onPageChange={handleChangePage}
+            rowsPerPage={rowsPerPage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            rowsPerPageOptions={[10, 25, 50, 100, 250, 500]}
+          />
         </div>
       </div>
     </PageLayout>

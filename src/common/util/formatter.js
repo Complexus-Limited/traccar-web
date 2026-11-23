@@ -19,6 +19,10 @@ dayjs.extend(duration);
 dayjs.extend(relativeTime);
 dayjs.extend(localizedFormat);
 
+export const formatHours = (value) => dayjs.duration(value).humanize();
+
+export const formatState = (value, t) => (value ? t('sharedOn') : t('sharedOff'));
+
 export const formatBoolean = (value, t) => (value ? t('sharedYes') : t('sharedNo'));
 
 export const formatNumber = (value, precision = 1) => Number(value.toFixed(precision));

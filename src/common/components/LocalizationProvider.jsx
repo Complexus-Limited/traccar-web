@@ -85,7 +85,7 @@ const languages = {
   de: { country: 'DE', name: 'Deutsch' },
   da: { country: 'DK', name: 'Dansk' },
   el: { country: 'GR', name: 'Ελληνικά' },
-  en: { country: 'US', name: 'English' },
+  en: { country: 'GB', name: 'English' },
   es: { country: 'ES', name: 'Español' },
   fa: { country: 'IR', name: 'فارسی' },
   fi: { country: 'FI', name: 'Suomi' },

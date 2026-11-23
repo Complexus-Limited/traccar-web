@@ -90,6 +90,8 @@ const BottomMenu = () => {
     dispatch(sessionActions.updateUser(null));
   };
 
+  const deviceId = useSelector((state) => state.devices.selectedId);
+
   const handleSelection = (event, value) => {
     switch (value) {
       case 'map':
