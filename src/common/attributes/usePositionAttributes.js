@@ -311,9 +311,9 @@ export default (t) => useMemo(() => ({
     name: t('positionRpm'),
     type: 'number',
   },
-  intakeAirTemp: {
-    name: t('positionIntakeAirTemp'),
-    type: 'number', 
+  intakeAirTemperature: {
+    name: t('positionIntakeAirTemperature'),
+    type: 'number',
   },
   maf: {
     name: t('positionMaf'),
@@ -363,6 +363,11 @@ export default (t) => useMemo(() => ({
     name: t('positionDriverBehaviour'),
     type: 'number',
   },
+  shortFuelTrim: {
+    name: t('positionShortFuelTrim'),
+    type: 'percentage',
+  },
+  
   motion: {
     name: t('positionMotion'),
     type: 'boolean',

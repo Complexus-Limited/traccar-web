@@ -76,8 +76,8 @@ const PositionValue = ({ position, property, attribute }) => {
       case 'unplugged':
       case 'manDown':  
         return formatBoolean(value, t);
-      case 'intakeAirTemp':
-        return value != null ? formatTemperature(value) : '';
+      case 'intakeAirTemperature':
+		    return formatTemperature(value);
       case 'maf':
         return value != null ? formatGsec(value) : '';
       case 'throttle':
@@ -94,8 +94,10 @@ const PositionValue = ({ position, property, attribute }) => {
         return value != null ? formatPercentage(value) : '';
       case 'egrError':
         return value != null ? formatPercentage(value) : '';
+      case 'shortFuelTrim':
+        return value != null ? formatPercentage(value) : ''; 
       case 'oilLevel':  
-        return formatBoolean(value, t);
+        return formatPercentage(value, t);
       case 'adBlueLevel':
         return value != null ? formatPercentage(value) : '';
       case 'alarm':
