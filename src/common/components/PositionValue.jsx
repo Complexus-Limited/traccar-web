@@ -19,6 +19,7 @@ import {
   formatVolume,
   formatConsumption,
   formatState,
+  formatGsec,
 } from '../util/formatter';
 import { speedToKnots } from '../util/converter';
 import { useAttributePreference, usePreference } from '../util/preferences';
@@ -78,7 +79,7 @@ const PositionValue = ({ position, property, attribute }) => {
       case 'intakeAirTemp':
         return value != null ? formatTemperature(value) : '';
       case 'maf':
-        return value != null ? formatTemperature(value) : '';
+        return value != null ? formatGsec(value) : '';
       case 'throttle':
         return value != null ? formatPercentage(value) : '';
       case 'coolantTemp':

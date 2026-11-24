@@ -29,6 +29,8 @@ export const formatNumber = (value, precision = 1) => Number(value.toFixed(preci
 
 export const formatPercentage = (value) => `${value}%`;
 
+export const formatGsec = (value) => `${value}g/s`;
+
 export const formatTemperature = (value) => `${value.toFixed(1)}°C`;
 
 export const formatVoltage = (value, t) => `${value.toFixed(2)} ${t('sharedVoltAbbreviation')}`;
