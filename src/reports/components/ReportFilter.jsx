@@ -225,7 +225,7 @@ const ReportFilter = ({ children, onShow, onExport, onSchedule, deviceType, load
           />
         </div>
       )}
-      {includeGroups && (
+      {deviceType === 'multiple' && (
         <div className={classes.filterItem}>
           <SelectField
             label={t('settingsGroups')}
