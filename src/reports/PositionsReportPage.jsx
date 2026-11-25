@@ -1,6 +1,6 @@
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { IconButton, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
+import { IconButton, Table, TableBody, TableCell, TableHead, TableRow, TablePagination } from '@mui/material';
 import GpsFixedIcon from '@mui/icons-material/GpsFixed';
 import LocationSearchingIcon from '@mui/icons-material/LocationSearching';
 import ReportFilter, { updateReportParams } from './components/ReportFilter';
@@ -46,6 +46,9 @@ const PositionsReportPage = () => {
     : null;
   const [loading, setLoading] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
+
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(50);
 
   const selectedRef = useRef();
 
